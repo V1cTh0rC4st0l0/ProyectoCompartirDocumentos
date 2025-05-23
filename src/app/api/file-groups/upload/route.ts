@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
     const nombreGrupo = formData.get('nombreGrupo') as string;
     const usuarioId = formData.get('usuarioId') as string;
 
+    const compartidoConRaw = formData.getAll('compartidoCon'); // espera un array de IDs
+    const compartidoCon = compartidoConRaw.map(id => new mongoose.Types.ObjectId(id.toString()));
+
     if (!nombreGrupo || !usuarioId) {
         return NextResponse.json({ ok: false, message: 'Faltan datos requeridos' }, { status: 400 });
     }
@@ -59,9 +62,10 @@ export async function POST(req: NextRequest) {
     }
 
     const grupo = await FileGroupModel.create({
-        nombre: nombreGrupo,
-        usuario: usuarioId,
+        nombreGrupo: nombreGrupo,
+        usuario: new mongoose.Types.ObjectId(usuarioId),
         archivos: archivosGuardados,
+        compartidoCon,
         fechaCreacion: new Date(),
     });
 

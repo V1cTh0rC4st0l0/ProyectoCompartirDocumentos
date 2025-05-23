@@ -1,34 +1,62 @@
-// src/app/api/files/[fileId]/route.ts
-import { connectGridFS } from '@/lib/gridfs';
-import { NextRequest } from 'next/server';
+// /app/api/files/[fileId]/route.ts
+import { NextResponse } from 'next/server';
+import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
+import { GridFSBucket } from 'mongodb';
 
 export async function GET(
-    req: NextRequest,
+    request: Request,
     { params }: { params: { fileId: string } }
 ) {
-    const gfs = await connectGridFS();
-    const fileId = params.fileId;
+
+    const awaitedParams = await params;
+    const { fileId } = awaitedParams;
+
+    if (!mongoose.Types.ObjectId.isValid(fileId)) {
+        return NextResponse.json({ message: 'ID de archivo inválido.' }, { status: 400 });
+    }
 
     try {
-        // Obtener el archivo desde GridFS
-        const file = await gfs.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
+        await connectDB();
+        const db = mongoose.connection.db;
 
-        if (!file || file.length === 0) {
-            return new Response('Archivo no encontrado', { status: 404 });
+        const bucket = new GridFSBucket(db, {
+            bucketName: 'uploads',
+        });
+
+        const files = await bucket.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
+
+        if (files.length === 0) {
+            return NextResponse.json({ message: 'Archivo no encontrado en GridFS.' }, { status: 404 });
         }
 
-        const { filename, contentType } = file[0]; // Acceder a los metadatos
+        const file = files[0];
 
-        const fileStream = gfs.openDownloadStream(new mongoose.Types.ObjectId(fileId));
+        const downloadStream = bucket.openDownloadStream(file._id);
 
-        return new Response(fileStream as any, {
-            headers: {
-                'Content-Disposition': `attachment; filename="${filename}"`, // Usar el nombre original
-                'Content-Type': contentType || 'application/octet-stream', // Usar el tipo MIME si está disponible
+        const headers = new Headers();
+        headers.set('Content-Type', file.contentType || 'application/octet-stream');
+        headers.set('Content-Disposition', `attachment; filename="${file.filename}"`);
+
+        const responseStream = new ReadableStream({
+            start(controller) {
+                downloadStream.on('data', (chunk) => {
+                    controller.enqueue(chunk);
+                });
+                downloadStream.on('end', () => {
+                    controller.close();
+                });
+                downloadStream.on('error', (err) => {
+                    console.error("Error en el stream de descarga de GridFS:", err);
+                    controller.error(err);
+                });
             },
         });
-    } catch (err) {
-        return new Response('Error interno del servidor', { status: 500 });
+
+        return new NextResponse(responseStream, { headers });
+
+    } catch (error: any) {
+        console.error('Error al servir el archivo desde GridFS:', error);
+        return NextResponse.json({ message: 'Error interno del servidor.', error: error.message }, { status: 500 });
     }
 }

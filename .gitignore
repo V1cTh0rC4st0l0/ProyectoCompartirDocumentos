@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-#Carpeta "temporal"
-/public/uploads/
+#Carpeta donde esta el ejecutable
+/public/Visor/

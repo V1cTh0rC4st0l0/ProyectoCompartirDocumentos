@@ -1,18 +1,17 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
-const fileSchema = new mongoose.Schema({
-    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
-    nombreArchivo: String,
-    tipoArchivo: String,
-    ruta: String,
-});
+const archivoSchema = new mongoose.Schema({
+    fileId: { type: mongoose.Schema.Types.ObjectId, required: true },
+    nombreArchivo: { type: String, required: true },
+    tipoArchivo: { type: String, required: true },
+}, { _id: false });
 
 const fileGroupSchema = new mongoose.Schema({
     nombreGrupo: { type: String, required: true },
-    archivos: [fileSchema],
-    creadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    archivos: [archivoSchema],
+    usuario: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     compartidoCon: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    creadoEn: { type: Date, default: Date.now },
-})
+    fechaCreacion: { type: Date, default: Date.now },
+});
 
-export default mongoose.models.FileGroup || mongoose.model('FileGroup', fileGroupSchema)
+export default mongoose.models.FileGroup || mongoose.model('FileGroup', fileGroupSchema);

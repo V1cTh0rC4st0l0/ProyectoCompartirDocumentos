@@ -1,0 +1,180 @@
+/* src/styles/login.module.css */
+
+.loginPageContainer {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.loginFormSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    /* Ocupa la mitad del espacio disponible */
+    padding: 20px;
+    /* Añade un poco de espacio alrededor del formulario */
+}
+
+.loginCard {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    /* Ancho fijo para el formulario */
+    max-width: 100%;
+    /* Asegura que no se desborde en pantallas pequeñas */
+}
+
+.imageCollageSection {
+    flex: 1;
+    /* Ocupa la mitad del espacio disponible */
+    background-color: #e0f7fa;
+    /* Un color de fondo para la sección del collage */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Estilos para el componente ImageCollage (puedes ajustarlos en su propio archivo CSS si lo prefieres) */
+.imageCollage {
+    /* Estilos para el contenedor principal del collage */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    /* Ejemplo de diseño de cuadrícula */
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+    /* Ancho máximo del collage */
+}
+
+.collageImageContainer {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    /* Mantiene las imágenes cuadradas */
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.collageImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logoContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #eee;
+}
+
+.logoImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.helloText {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.secondaryText {
+    color: #777;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.label {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.passwordInputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.passwordInput {
+    padding-right: 35px;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #777;
+}
+
+.loginButton {
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.loginButton:hover {
+    background-color: #0056b3;
+}
+
+/* Media query para pantallas más pequeñas (ejemplo) */
+@media (max-width: 768px) {
+    .loginPageContainer {
+        flex-direction: column;
+        /* Apila las secciones en pantallas pequeñas */
+    }
+
+    .loginFormSection {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .loginCard {
+        width: 100%;
+        max-width: none;
+    }
+
+    .imageCollageSection {
+        width: 100%;
+        padding: 20px;
+    }
+}

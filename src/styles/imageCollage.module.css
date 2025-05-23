@@ -1,0 +1,232 @@
+/* src/styles/imageCollage.module.css */
+
+/* Estilos para el modal (sin cambios importantes en la estructura) */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 800px;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+}
+
+.imageTimeline {
+    display: flex;
+    overflow-x: auto;
+    /* Habilita el scroll horizontal para el carrusel */
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+    gap: 8px;
+    /* Espacio entre las imágenes */
+}
+
+.timelineItem {
+    flex-shrink: 0;
+    /* Evita que los elementos se encojan */
+    width: 120px;
+    /* Ancho base de cada imagen */
+    height: 90px;
+    /* Alto base de cada imagen */
+    overflow: hidden;
+    /* Recorta la imagen si no encaja */
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+    /* Para el efecto de desplazamiento vertical */
+    transition: transform 0.3s ease-in-out;
+    /* Suaviza el desplazamiento */
+}
+
+.timelineItem:nth-child(even) {
+    transform: translateY(10px);
+    /* Desplaza las filas pares un poco hacia abajo */
+}
+
+.imageContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.imageContainer>button.deleteButton {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: rgba(220, 53, 69, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    z-index: 10;
+}
+
+.imageContainer>div>img {
+    object-fit: cover;
+    /* Cubre el contenedor sin deformar */
+    width: 100%;
+    height: 100%;
+}
+
+.addImageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 90px;
+    /* Ajusta la altura al de las imágenes */
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #777;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.addImageContainer>input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.addImageContainer>button.addButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.dropText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 5px;
+}
+
+.closeButton {
+    background-color: #5cb85c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    width: 100%;
+}
+
+.closeButton:hover {
+    background-color: #4cae4c;
+}
+
+/* Estilos específicos para el collage en la página de login */
+.imageCollage {
+    overflow-x: auto;
+    /* Habilita el scroll horizontal */
+    padding: 10px 0;
+    /* Un poco de padding vertical */
+}
+
+.imageCollage>.imageTimeline {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* Espacio entre las imágenes en el collage */
+    padding: 10px;
+    /* Espacio interno del contenedor del carrusel */
+}
+
+.imageCollage>.imageTimeline>.timelineItem {
+    flex-shrink: 0;
+    width: 150px;
+    /* Ajusta el ancho de las imágenes del collage */
+    height: 110px;
+    /* Ajusta la altura de las imágenes del collage */
+    overflow: hidden;
+    border-radius: 6px;
+    /* Opcional: si quieres un pequeño borde redondeado */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+    /* Sombra suave opcional */
+    transform: translateY(0);
+    /* Resetear el desplazamiento para el login */
+}
+
+.imageCollage>.imageTimeline>.timelineItem:nth-child(even) {
+    transform: translateY(5px);
+    /* Desplazamiento sutil para filas alternas */
+}
+
+.imageCollage>.imageTimeline>.timelineItem>.imageContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.imageCollage>.imageTimeline>.timelineItem>.imageContainer>div>img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.imageCollage>.imageTimeline>.emptyCollageText {
+    color: #777;
+    font-style: italic;
+}
+
+/* Animación de carrusel */
+@keyframes scrollLeft {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-30%);
+        /* Desplaza todo el ancho del contenido */
+    }
+}
+
+.imageCollage.animate {
+    animation: scrollLeft 5s linear infinite;
+    /* Ajusta la duración y el tipo de animación */
+}
