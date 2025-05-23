@@ -8,10 +8,26 @@ export function middleware(req: NextRequest) {
     const token = req.cookies.get('token')?.value;
     const { pathname } = req.nextUrl;
 
-    // Manejar solo la raíz "/"
-    if (pathname === '/') {
-        const url = req.nextUrl.clone();
+    const url = req.nextUrl.clone();
 
+    if (pathname === '/') {
+        if (!token) {
+            url.pathname = '/login';
+            return NextResponse.redirect(url);
+        }
+
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET) as { rol: string };
+            url.pathname = decoded.rol === 'admin' ? '/admin' : '/dashboard';
+            return NextResponse.redirect(url);
+        } catch {
+            url.pathname = '/login';
+            return NextResponse.redirect(url);
+        }
+    }
+
+    // Protege rutas /admin y /dashboard con validación de rol
+    if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard')) {
         if (!token) {
             url.pathname = '/login';
             return NextResponse.redirect(url);
@@ -20,18 +36,26 @@ export function middleware(req: NextRequest) {
         try {
             const decoded = jwt.verify(token, JWT_SECRET) as { rol: string };
 
-            // Redirige a dashboard o admin según el rol
-            url.pathname = decoded.rol === 'admin' ? '/admin' : '/dashboard';
-            return NextResponse.redirect(url);
-        } catch (err) {
+            if (pathname.startsWith('/admin') && decoded.rol !== 'admin') {
+                url.pathname = '/login';
+                return NextResponse.redirect(url);
+            }
+
+            if (pathname.startsWith('/dashboard') && !['admin', 'user'].includes(decoded.rol)) {
+                url.pathname = '/login';
+                return NextResponse.redirect(url);
+            }
+
+            return NextResponse.next();
+        } catch {
             url.pathname = '/login';
             return NextResponse.redirect(url);
         }
     }
 
-    return NextResponse.next();
+    return NextResponse.next(); // Rutas públicas
 }
 
 export const config = {
-    matcher: ['/'],
+    matcher: ['/', '/admin/:path*', '/dashboard/:path*'],
 };

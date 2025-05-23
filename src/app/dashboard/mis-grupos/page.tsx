@@ -1,4 +1,4 @@
-// src/app/(dashboard)/mis-grupos/page.tsx
+// src/app/dashboard/mis-grupos/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
