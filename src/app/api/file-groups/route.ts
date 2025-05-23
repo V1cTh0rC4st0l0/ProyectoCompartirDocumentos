@@ -1,54 +1,69 @@
-import { NextResponse } from 'next/server'
-import { IncomingForm } from 'formidable'
-import fs from 'fs'
-import path from 'path'
-import { promisify } from 'util'
-import { connectDB } from '@/lib/mongodb'
-import FileGroup from '@/models/FileGroup'
+// src/app/api/file-groups/route.ts
+import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
+import { connectDB } from '@/lib/mongodb';
+import FileGroupModel, { IFileGroup, IArchivo } from '@/models/FileGroup';
+import mongoose from 'mongoose';
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-}
+const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 
-const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-fs.mkdirSync(uploadDir, { recursive: true })
+export async function POST(req: NextRequest) {
+    try {
+        await connectDB();
+        await fs.mkdir(uploadDir, { recursive: true });
 
-export async function POST(req: Request) {
-    await connectDB()
+        const formData = await req.formData();
 
-    const form = new IncomingForm({ multiples: true, uploadDir, keepExtensions: true })
+        const nombreGrupo = formData.get('nombreGrupo') as string | null;
+        const usuarioId = formData.get('usuarioId') as string | null;
+        const uploadedFiles = formData.getAll('archivos');
 
-    const parseForm = () =>
-        new Promise((resolve, reject) => {
-            form.parse(req as any, (err, fields, files) => {
-                if (err) reject(err)
-                else resolve({ fields, files })
-            })
-        })
+        const archivosArray: File[] = uploadedFiles.filter(item => item instanceof File) as File[];
 
-    const { fields, files }: any = await parseForm()
-    const nombreGrupo = fields.nombreGrupo?.[0]
-    const usuarioId = fields.usuarioId?.[0] || null // lo puedes pasar si quieres guardar quién sube
+        if (!nombreGrupo || archivosArray.length === 0) {
+            return NextResponse.json({ error: 'Faltan datos o no se subieron archivos.' }, { status: 400 });
+        }
 
-    if (!nombreGrupo || !files.archivos) {
-        return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
+        const fileDocs: Omit<IArchivo, 'fileId'>[] = [];
+
+        for (const file of archivosArray) {
+            const originalFilename = file.name;
+            const mimetype = file.type || 'application/octet-stream';
+            const uniqueFilename = `${Date.now()}-${originalFilename}`;
+            const filePath = path.join(uploadDir, uniqueFilename);
+            const buffer = await file.arrayBuffer();
+
+            await fs.writeFile(filePath, Buffer.from(buffer));
+
+            fileDocs.push({
+                nombreArchivo: originalFilename,
+                tipoArchivo: mimetype,
+                ruta: `/uploads/${uniqueFilename}`,
+            });
+        }
+
+        const nuevoGrupo: IFileGroup = await FileGroupModel.create({
+            nombreGrupo,
+            archivos: fileDocs.map(doc => ({
+                ...doc,
+                fileId: new mongoose.Types.ObjectId(),
+            })),
+            usuario: usuarioId ? new mongoose.Types.ObjectId(usuarioId) : undefined,
+            fechaCreacion: new Date(),
+        });
+
+        return NextResponse.json({ success: true, grupo: nuevoGrupo });
+
+    } catch (error: unknown) {
+        console.error('Error en la ruta de subida de archivos:', error);
+        let errorMessage = 'Error interno del servidor al procesar la solicitud.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'object' && error !== null && 'message' in error) {
+            errorMessage = (error as { message: string }).message;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
-
-    const archivos = Array.isArray(files.archivos) ? files.archivos : [files.archivos]
-
-    const fileDocs = archivos.map((file) => ({
-        nombreArchivo: file.originalFilename,
-        tipoArchivo: file.mimetype,
-        ruta: `/uploads/${path.basename(file.filepath)}`,
-    }))
-
-    const nuevoGrupo = await FileGroup.create({
-        nombreGrupo,
-        archivos: fileDocs,
-        creadoPor: usuarioId,
-    })
-
-    return NextResponse.json({ success: true, grupo: nuevoGrupo })
 }

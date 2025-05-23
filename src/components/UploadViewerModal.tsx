@@ -55,10 +55,27 @@ export default function UploadViewerModal({ onClose }: UploadViewerModalProps) {
                 setMessage(`Error: ${res.data.message}`);
                 setIsError(true);
             }
-        } catch (error: any) {
+        } catch (error: unknown) { // 'unknown' es más seguro que 'any'
             console.error('Error al subir el archivo:', error);
-            setMessage(`Error al subir: ${error.response?.data?.message || error.message}`);
-            setIsError(true);
+
+            let errorMessage = 'Error desconocido al subir el visor.';
+
+            // Comprobar si es un error de Axios
+            if (axios.isAxiosError(error)) {
+                // Si el error tiene una respuesta y datos con un mensaje
+                if (error.response?.data?.message) {
+                    errorMessage = `Error al subir: ${error.response.data.message}`;
+                } else if (error.message) {
+                    // Si no hay mensaje específico de la API, usar el mensaje del error de Axios
+                    errorMessage = `Error al subir: ${error.message}`;
+                }
+            } else if (error instanceof Error) {
+                // Si es una instancia de Error estándar
+                errorMessage = `Error al subir: ${error.message}`;
+            }
+
+            setMessage(errorMessage);
+            setIsError(true)
         } finally {
             setUploading(false);
         }

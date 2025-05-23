@@ -1,6 +1,8 @@
+// src/components/UserFileGroups.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 type FileData = {
     _id: string;
@@ -20,9 +22,22 @@ export default function UserFileGroups({ usuarioId }: { usuarioId: string }) {
 
     useEffect(() => {
         const fetchGrupos = async () => {
-            const res = await fetch(`/api/file-groups/compartidos/${usuarioId}`);
-            const data = await res.json();
-            setGrupos(data);
+            try {
+                const res = await fetch(`/api/file-groups/compartidos/${usuarioId}`);
+                if (!res.ok) {
+                    throw new Error(`Error HTTP: ${res.status}`);
+                }
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setGrupos(data);
+                } else {
+                    console.error("Datos recibidos no son un array:", data);
+                    setGrupos([]);
+                }
+            } catch (error) {
+                console.error("Error al cargar grupos compartidos:", error);
+                setGrupos([]);
+            }
         };
         fetchGrupos();
     }, [usuarioId]);
@@ -32,20 +47,23 @@ export default function UserFileGroups({ usuarioId }: { usuarioId: string }) {
 
         if (tipo.startsWith('image/')) {
             return (
-                <img
+
+                <Image
                     src={file.url}
                     alt={file.nombreArchivo}
-                    className="h-24 w-24 object-cover rounded shadow"
+                    width={96}
+                    height={96}
+                    className="object-cover rounded shadow"
                 />
             );
         }
 
-        if (tipo === 'application/pdf') return <span>📄</span>;
-        if (tipo.includes('zip') || tipo.includes('rar')) return <span>📦</span>;
-        if (file.nombreArchivo.endsWith('.dcm')) return <span>🧪</span>;
-        if (file.nombreArchivo.endsWith('.xml')) return <span>📁</span>;
+        if (tipo === 'application/pdf') return <span role="img" aria-label="PDF icon">📄</span>;
+        if (tipo.includes('zip') || tipo.includes('rar')) return <span role="img" aria-label="Archive icon">📦</span>;
+        if (file.nombreArchivo.endsWith('.dcm')) return <span role="img" aria-label="DCM icon">🧪</span>;
+        if (file.nombreArchivo.endsWith('.xml')) return <span role="img" aria-label="XML icon">📁</span>;
 
-        return <span>📎</span>;
+        return <span role="img" aria-label="File icon">📎</span>;
     };
 
     return (

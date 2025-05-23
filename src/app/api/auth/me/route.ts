@@ -20,7 +20,7 @@ export async function GET(req: Request) {
         if (!user) return NextResponse.json({ message: 'Usuario no encontrado' }, { status: 404 });
 
         return NextResponse.json({ username: user.username, rol: user.rol });
-    } catch (err) {
+    } catch {
         return NextResponse.json({ message: 'Token inválido' }, { status: 401 });
     }
 }

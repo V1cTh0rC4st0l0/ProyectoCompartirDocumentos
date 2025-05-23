@@ -1,7 +1,7 @@
 // src/app/admin/layout.tsx
 'use client';
 
-import { useState, useEffect } from 'react'; // Importa useEffect
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/adminLayout.module.css';
 import PanelDeOpciones from '@/components/PanelDeOpciones';
@@ -9,21 +9,19 @@ import ImageCollage from '@/components/ImageCollage';
 import CreateUserModal from '@/components/CreateUserModal';
 import UploadFilesModal from '@/components/UploadFilesModal';
 import UploadViewerModal from '@/components/UploadViewerModal';
-import DownloadViewerButton from '@/components/DownloadViewerButton'; // Este componente no se está usando actualmente, pero lo dejo por si lo necesitas más adelante.
-import { FiMenu, FiX } from 'react-icons/fi'; // Importamos iconos de menú y cerrar
+import { FiMenu, FiX } from 'react-icons/fi';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Estado para controlar el sidebar
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [isCollageModalOpen, setIsCollageModalOpen] = useState(false);
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
     const [isUploadFilesModalOpen, setIsUploadFilesModalOpen] = useState(false);
     const [isUploadViewerModalOpen, setIsUploadViewerModalOpen] = useState(false);
 
-    // Cierra el sidebar si la ventana es redimensionada a un tamaño grande
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 768) { // 768px es el breakpoint para 'md' en Tailwind por defecto
+            if (window.innerWidth >= 768) {
                 setIsSidebarOpen(false);
             }
         };
@@ -36,10 +34,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    // Funciones para abrir/cerrar modales (estas ya las tenías)
     const openPanel = () => {
         setIsPanelOpen(true);
-        setIsSidebarOpen(false); // Cierra el sidebar al abrir un modal
+        setIsSidebarOpen(false);
     };
 
     const closePanel = () => {
@@ -48,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const openCollageModal = () => {
         setIsCollageModalOpen(true);
-        setIsSidebarOpen(false); // Cierra el sidebar al abrir un modal
+        setIsSidebarOpen(false);
     };
 
     const closeCollageModal = () => {
@@ -57,7 +54,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const openCreateUserModal = () => {
         setIsCreateUserModalOpen(true);
-        setIsSidebarOpen(false); // Cierra el sidebar al abrir un modal
+        setIsSidebarOpen(false);
     };
 
     const closeCreateUserModal = () => {
@@ -66,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const openUploadFilesModal = () => {
         setIsUploadFilesModalOpen(true);
-        setIsSidebarOpen(false); // Cierra el sidebar al abrir un modal
+        setIsSidebarOpen(false);
     };
 
     const closeUploadFilesModal = () => {
@@ -75,7 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const openUploadViewerModal = () => {
         setIsUploadViewerModalOpen(true);
-        setIsSidebarOpen(false); // Cierra el sidebar al abrir un modal
+        setIsSidebarOpen(false);
     };
 
     const closeUploadViewerModal = () => {
@@ -83,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     return (
-        <div className={styles.dashboardLayoutContainer}> {/* Usa la clase del contenedor principal */}
+        <div className={styles.dashboardLayoutContainer}>
             {/* Botón de menú para móviles */}
             <button className={styles.menuButton} onClick={toggleSidebar}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
@@ -116,10 +113,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <button onClick={openUploadViewerModal} className={styles.sidebarLink}>
                         Subir Visor 3D
                     </button>
-                    {/* Si decides usar DownloadViewerButton aquí en el futuro, puedes añadirlo */}
-                    {/* <div className={styles.sidebarLink}>
-            <DownloadViewerButton />
-          </div> */}
                 </nav>
             </aside>
 

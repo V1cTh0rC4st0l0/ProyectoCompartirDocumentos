@@ -27,7 +27,6 @@ export default function MisGruposPage() {
     }, []);
 
     const renderArchivo = (archivo: Archivo) => {
-        const ext = archivo.tipoArchivo.split('/')[1];
 
         if (archivo.tipoArchivo.startsWith('image/')) {
             return (

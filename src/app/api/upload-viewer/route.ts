@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import { Readable } from 'stream';
 import mongoose from 'mongoose';
-import { GridFSBucket } from 'mongodb';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,8 +54,8 @@ export async function POST(req: NextRequest) {
             fileName: viewerFile.name,
         }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error al subir el visor:', error);
-        return NextResponse.json({ ok: false, message: 'Error interno del servidor al subir el visor.', error: error.message }, { status: 500 });
+        return NextResponse.json({ ok: false, message: 'Error interno del servidor al subir el visor.', error }, { status: 500 });
     }
 }

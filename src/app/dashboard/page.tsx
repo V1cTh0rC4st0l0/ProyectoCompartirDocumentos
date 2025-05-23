@@ -4,25 +4,21 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
-import Link from 'next/link';
-
-// Importa iconos de React-Icons
-import { FiDownload, FiFile, FiImage, FiFileText } from 'react-icons/fi';
+import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
-
-// Importa los estilos CSS Module
 import styles from '@/styles/dashboard.module.css';
 
-type File = {
+type FileData = {
     fileId: string;
     nombreArchivo: string;
     tipoArchivo: string;
+    ruta?: string;
 };
 
 type FileGroup = {
     _id: string;
     nombreGrupo: string;
-    archivos: File[];
+    archivos: FileData[];
 };
 
 export default function DashboardPage() {
@@ -43,9 +39,21 @@ export default function DashboardPage() {
                     console.warn('API returned unexpected data for file groups (not an array):', res.data);
                     setFileGroups([]);
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Error al cargar grupos de archivos', err);
-                setError('No se pudieron cargar los archivos compartidos. Por favor, inténtalo de nuevo más tarde.');
+                let errorMessage = 'No se pudieron cargar los archivos compartidos. Por favor, inténtalo de nuevo más tarde.';
+
+                if (axios.isAxiosError(err)) {
+                    if (err.response?.data?.message) {
+                        errorMessage = err.response.data.message;
+                    } else if (err.message) {
+                        errorMessage = `Error: ${err.message}`;
+                    }
+                } else if (err instanceof Error) {
+                    errorMessage = `Error: ${err.message}`;
+                }
+
+                setError(errorMessage);
                 setFileGroups([]);
             } finally {
                 setLoading(false);
@@ -55,7 +63,7 @@ export default function DashboardPage() {
         fetchGroups();
     }, []);
 
-    const handleDownloadGroup = async (groupId: string, groupName: string) => {
+    const handleDownloadGroup = async (groupId: string) => {
         if (!groupId) {
             console.error('No se proporcionó un ID de grupo para descargar.');
             alert('Error: ID de grupo no disponible.');
@@ -69,7 +77,7 @@ export default function DashboardPage() {
         }
     };
 
-    const handleDownloadFile = (fileId: string, fileName: string) => {
+    const handleDownloadFile = (fileId: string) => {
         if (!fileId) {
             console.error('No se proporcionó un ID de archivo para descargar.');
             alert('Error: ID de archivo no disponible para descarga.');
@@ -78,7 +86,7 @@ export default function DashboardPage() {
         window.location.href = `/api/files/${fileId}`;
     };
 
-    const renderFileIcon = (file: File) => {
+    const renderFileIcon = (file: FileData) => {
         if (file.tipoArchivo.startsWith('image/')) {
             return (
                 <Image
@@ -86,7 +94,7 @@ export default function DashboardPage() {
                     alt={file.nombreArchivo}
                     width={100}
                     height={100}
-                    className={styles.iconImage} // Aplicar clase CSS para la imagen
+                    className={styles.iconImage}
                 />
             );
         }
@@ -133,7 +141,7 @@ export default function DashboardPage() {
                         <div className={styles.groupHeader}>
                             <h2 className={styles.groupTitle}>{group.nombreGrupo}</h2>
                             <button
-                                onClick={() => handleDownloadGroup(group._id, group.nombreGrupo)}
+                                onClick={() => handleDownloadGroup(group._id)}
                                 className={styles.downloadGroupButton}
                             >
                                 <FiDownload className="mr-2" /> Descargar Grupo
@@ -150,7 +158,7 @@ export default function DashboardPage() {
                                     </div>
                                     <p className={styles.fileName}>{file.nombreArchivo}</p>
                                     <button
-                                        onClick={() => handleDownloadFile(file.fileId, file.nombreArchivo)}
+                                        onClick={() => handleDownloadFile(file.fileId)}
                                         className={styles.downloadFileButton}
                                     >
                                         <FiDownload className="mr-1" /> Descargar

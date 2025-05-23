@@ -19,7 +19,7 @@ export default function DownloadViewerButton() {
                 } else {
                     setError(res.data.message || 'No se pudo obtener la información del visor.');
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error('Error fetching viewer info:', err);
                 setError('Error al cargar la información del visor.');
             } finally {

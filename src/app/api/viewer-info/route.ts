@@ -6,7 +6,13 @@ import { GridFSBucket } from 'mongodb';
 
 export async function GET() {
     await connectDB();
+
     const db = mongoose.connection.db;
+    if (!db) {
+        console.error('Error: Database instance not available.');
+        return NextResponse.json({ ok: false, message: 'Internal server error: Database not connected.' }, { status: 500 });
+    }
+
     const bucket = new GridFSBucket(db, { bucketName: 'uploads' });
 
     try {
@@ -25,8 +31,8 @@ export async function GET() {
             fileName: viewerFile[0].filename,
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error al obtener info del visor:', error);
-        return NextResponse.json({ ok: false, message: 'Error interno del servidor.', error: error.message }, { status: 500 });
+        return NextResponse.json({ ok: false, message: 'Error interno del servidor.', error }, { status: 500 });
     }
 }

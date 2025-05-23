@@ -53,7 +53,7 @@ export function middleware(req: NextRequest) {
         }
     }
 
-    return NextResponse.next(); // Rutas públicas
+    return NextResponse.next();
 }
 
 export const config = {

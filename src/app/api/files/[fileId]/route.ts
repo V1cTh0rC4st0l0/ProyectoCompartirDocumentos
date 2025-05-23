@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
-import { GridFSBucket } from 'mongodb';
+import { GridFSBucket, GridFSFile } from 'mongodb';
 
 export async function GET(
     request: Request,
@@ -20,17 +20,22 @@ export async function GET(
         await connectDB();
         const db = mongoose.connection.db;
 
+        if (!db) {
+            console.error('Error: La instancia de la base de datos no está disponible.');
+            return NextResponse.json({ message: 'Error interno del servidor: Base de datos no disponible.' }, { status: 500 });
+        }
+
         const bucket = new GridFSBucket(db, {
             bucketName: 'uploads',
         });
 
-        const files = await bucket.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
+        const files: GridFSFile[] = await bucket.find({ _id: new mongoose.Types.ObjectId(fileId) }).toArray();
 
         if (files.length === 0) {
             return NextResponse.json({ message: 'Archivo no encontrado en GridFS.' }, { status: 404 });
         }
 
-        const file = files[0];
+        const file: GridFSFile = files[0];
 
         const downloadStream = bucket.openDownloadStream(file._id);
 
@@ -40,23 +45,30 @@ export async function GET(
 
         const responseStream = new ReadableStream({
             start(controller) {
-                downloadStream.on('data', (chunk) => {
+                downloadStream.on('data', (chunk: Buffer) => {
                     controller.enqueue(chunk);
                 });
                 downloadStream.on('end', () => {
                     controller.close();
                 });
-                downloadStream.on('error', (err) => {
+                downloadStream.on('error', (err: Error) => {
                     console.error("Error en el stream de descarga de GridFS:", err);
                     controller.error(err);
                 });
             },
+            cancel() {
+                downloadStream.destroy();
+            }
         });
 
         return new NextResponse(responseStream, { headers });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error al servir el archivo desde GridFS:', error);
-        return NextResponse.json({ message: 'Error interno del servidor.', error: error.message }, { status: 500 });
+        let errorMessage = 'Error interno del servidor.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return NextResponse.json({ message: 'Error interno del servidor.', error: errorMessage }, { status: 500 });
     }
 }

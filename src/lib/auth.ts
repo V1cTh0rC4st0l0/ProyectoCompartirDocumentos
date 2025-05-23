@@ -14,8 +14,11 @@ export async function getUserFromCookies() {
     try {
         const decoded = verify(token, JWT_SECRET) as { userId: string };
         const user = await User.findById(decoded.userId).lean();
+
         return user;
-    } catch (err) {
+    } catch (error: unknown) {
+        console.error('Error al verificar el token o encontrar el usuario:', error);
+
         return null;
     }
 }

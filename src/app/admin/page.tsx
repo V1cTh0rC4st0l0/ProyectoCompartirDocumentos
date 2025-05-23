@@ -2,37 +2,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link'; // Aunque no lo uses directamente en el renderizado, puede ser útil.
-import { useRouter } from 'next/navigation';
-import UserList from './components/UserList'; // Mantén el componente UserList
-import Image from 'next/image'; // Para renderizar miniaturas de imágenes
-
-// Importa iconos de React-Icons
-import { FiDownload, FiFile, FiImage, FiFileText } from 'react-icons/fi';
+import UserList from './components/UserList';
+import Image from 'next/image';
+import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 
-// Importa los estilos CSS Module desde el archivo de dashboard
-import styles from '@/styles/dashboard.module.css'; // Usamos los mismos estilos del dashboard de usuario
+import styles from '@/styles/dashboard.module.css';
 
-// Define la estructura del usuario, incluyendo los grupos de archivos compartidos
-type File = {
+type FileData = {
   fileId: string;
   nombreArchivo: string;
   tipoArchivo: string;
+  ruta?: string;
 };
 
 type FileGroup = {
   _id: string;
   nombreGrupo: string;
-  archivos: File[];
-  creadoEn: string; // Puede que necesites este campo o no, depende de tu API
+  archivos: FileData[];
+  creadoEn?: string;
 };
 
 type User = {
   _id: string;
   username: string;
-  email: string; // Asumiendo que también querrás el email
-  sharedFileGroups: FileGroup[]; // Usa la misma estructura de FileGroup
+  email: string;
+  sharedFileGroups?: FileGroup[];
 };
 
 export default function AdminDashboard() {
@@ -41,22 +36,18 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();
-
   useEffect(() => {
     const fetchAdminData = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Asumiendo que esta API te devuelve los usuarios con sus sharedFileGroups cargados
         const res = await fetch('/api/admin/dashboard-data');
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json();
-        // Asegúrate de que 'data.users' contenga la estructura esperada
-        setUsers(data.users || []);
-      } catch (err: any) {
+        setUsers(Array.isArray(data.users) ? data.users : []);
+      } catch (err: unknown) {
         console.error('Error fetching admin data:', err);
         setError('Error al cargar los datos del administrador. Por favor, inténtalo de nuevo.');
       } finally {
@@ -67,13 +58,28 @@ export default function AdminDashboard() {
     fetchAdminData();
   }, []);
 
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(search.toLowerCase()) ||
-    user.email.toLowerCase().includes(search.toLowerCase()) // Buscar también por email
-  );
+  // --- CORRECCIÓN CLAVE AQUÍ ---
+  const filteredUsers = users.filter((user) => {
+    // Si la barra de búsqueda está vacía, muestra todos los usuarios
+    if (!search) {
+      return true;
+    }
 
-  // Función para renderizar el icono del archivo (copiada de dashboard/page.tsx)
-  const renderFileIcon = (file: File) => {
+    // Comprobar si el usuario existe y si sus propiedades son strings antes de usar toLowerCase
+    const username = user?.username || ''; // Si user.username es undefined/null, usa un string vacío
+    const email = user?.email || '';     // Si user.email es undefined/null, usa un string vacío
+
+    const lowerCaseSearch = search.toLowerCase();
+
+    return (
+      username.toLowerCase().includes(lowerCaseSearch) ||
+      email.toLowerCase().includes(lowerCaseSearch)
+    );
+  });
+  // --- FIN DE LA CORRECCIÓN CLAVE ---
+
+
+  const renderFileIcon = (file: FileData) => {
     if (file.tipoArchivo.startsWith('image/')) {
       return (
         <Image
@@ -81,7 +87,7 @@ export default function AdminDashboard() {
           alt={file.nombreArchivo}
           width={100}
           height={100}
-          className={styles.iconImage} // Aplicar clase CSS para la imagen
+          className={styles.iconImage}
         />
       );
     }
@@ -112,7 +118,6 @@ export default function AdminDashboard() {
     return <FiFile className="text-5xl text-gray-500 mx-auto" />;
   };
 
-  // Funciones de descarga (similares a dashboard/page.tsx)
   const handleDownloadGroup = (groupId: string) => {
     if (!groupId) {
       console.error('No se proporcionó un ID de grupo para descargar.');
@@ -133,15 +138,13 @@ export default function AdminDashboard() {
 
 
   return (
-    <div className={styles.dashboardContainer}> {/* Usa la clase del contenedor principal del dashboard */}
+    <div className={styles.dashboardContainer}>
       <h1 className={styles.title}>Panel de Administración</h1>
-
-      {/* Barra de búsqueda */}
       <div className="mb-6">
         <input
           type="text"
           placeholder="Buscar usuarios por nombre o email..."
-          className="w-full px-4 py-2 border rounded shadow" // Mantén clases de Tailwind aquí si no tienes una clase específica en dashboard.module.css
+          className="w-full px-4 py-2 border rounded shadow"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -154,23 +157,22 @@ export default function AdminDashboard() {
       ) : filteredUsers.length === 0 ? (
         <p className={styles.noFilesMessage}>No se encontraron usuarios que coincidan con la búsqueda.</p>
       ) : (
-        <div className="space-y-8"> {/* Agrega espacio entre las secciones de usuario */}
+        <div className="space-y-8">
           {filteredUsers.map((user) => (
-            <div key={user._id} className={styles.fileGroup}> {/* Reutiliza la clase fileGroup para la tarjeta de usuario */}
+            <div key={user._id} className={styles.fileGroup}>
               <div className={styles.groupHeader}>
                 <h2 className={styles.groupTitle}>Archivos compartidos con {user.username}</h2>
-                {/* Opcional: Podrías añadir un botón para ver todos los archivos de este usuario si fueran muchos */}
               </div>
 
               {user.sharedFileGroups && user.sharedFileGroups.length > 0 ? (
                 user.sharedFileGroups.map((group) => (
-                  <div key={group._id} className={styles.fileGroup} style={{ border: 'none', boxShadow: 'none', padding: '0', marginBottom: '1rem' }}> {/* Sub-grupo, sin borde ni sombra externa */}
-                    <div className={styles.groupHeader} style={{ marginBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}> {/* Borde inferior para separar */}
-                      <h3 className="text-md font-medium text-gray-700">{group.nombreGrupo}</h3> {/* Un h3 para los nombres de grupo */}
+                  <div key={group._id} className={styles.fileGroup} style={{ border: 'none', boxShadow: 'none', padding: '0', marginBottom: '1rem' }}>
+                    <div className={styles.groupHeader} style={{ marginBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+                      <h3 className="text-md font-medium text-gray-700">{group.nombreGrupo}</h3>
                       <button
                         onClick={() => handleDownloadGroup(group._id)}
                         className={styles.downloadGroupButton}
-                        style={{ padding: '00.35rem 0.75rem', fontSize: '0.8rem' }} // Hacer el botón un poco más pequeño para sub-grupos
+                        style={{ padding: '00.35rem 0.75rem', fontSize: '0.8rem' }}
                       >
                         <FiDownload className="mr-1" /> Descargar Grupo
                       </button>
@@ -204,8 +206,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Sección de UserList */}
-      <div className="mt-8"> {/* Espacio superior para separar */}
+      <div className="mt-8">
         <h2 className={styles.title} style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>Gestión de Usuarios</h2>
         <UserList />
       </div>

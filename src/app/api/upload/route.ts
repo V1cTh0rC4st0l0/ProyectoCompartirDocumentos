@@ -2,12 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectGridFS } from '@/lib/gridfs';
 import { Readable } from 'stream';
-import multer from 'multer';
-import { promisify } from 'util';
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-const runMiddleware = promisify(upload.single('file'));
 
 export async function POST(req: NextRequest) {
     const formData = await req.formData();
@@ -21,8 +15,8 @@ export async function POST(req: NextRequest) {
     const gfs = await connectGridFS();
     const filename = file.name;
     const contentType = file.type;
-
     const stream = gfs.openUploadStream(filename, { contentType });
+
     Readable.from(buffer).pipe(stream);
 
     return new Promise((resolve, reject) => {
@@ -30,7 +24,8 @@ export async function POST(req: NextRequest) {
             resolve(NextResponse.json({ ok: true, fileId: stream.id }));
         });
         stream.on('error', (err) => {
-            reject(NextResponse.json({ ok: false, error: err.message }));
+            console.error('Error al subir a GridFS:', err);
+            reject(NextResponse.json({ ok: false, error: err.message }, { status: 500 }));
         });
     });
 }

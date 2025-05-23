@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mi Aplicación de Gestión de Archivos",
+  title: "Raxvel",
   description: "Plataforma para compartir y gestionar archivos.",
 };
 
