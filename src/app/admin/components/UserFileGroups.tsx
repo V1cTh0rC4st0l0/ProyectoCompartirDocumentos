@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 
 interface Archivo {
+    _id: string
     nombreArchivo: string
     tipoArchivo: string
     ruta: string
@@ -40,8 +41,8 @@ export default function UserFileGroups({ usuarioId }: { usuarioId: string }) {
                     <h3 className="text-lg font-semibold">{grupo.nombreGrupo}</h3>
                     <p className="text-sm text-gray-500">Creado el {new Date(grupo.creadoEn).toLocaleDateString()}</p>
                     <ul className="mt-2 space-y-2">
-                        {grupo.archivos.map((archivo, index) => (
-                            <li key={index} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
+                        {grupo.archivos.map((archivo) => (
+                            <li key={archivo._id} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded">
                                 <span>{archivo.nombreArchivo}</span>
                                 <a
                                     href={archivo.ruta}
@@ -54,6 +55,7 @@ export default function UserFileGroups({ usuarioId }: { usuarioId: string }) {
                             </li>
                         ))}
                     </ul>
+
                 </div>
             ))}
         </div>

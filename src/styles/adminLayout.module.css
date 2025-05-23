@@ -1,26 +1,32 @@
 /* /styles/adminLayout.module.css */
 
-.adminLayoutContainer {
+.dashboardLayoutContainer {
     display: flex;
     min-height: 100vh;
+    position: relative;
+    /* Necesario para posicionar el botón del menú */
 }
 
+/* Sidebar */
 .sidebar {
     width: 240px;
-    /* Ajusta el ancho según necesites */
     background-color: #2d3748;
-    /* Un color oscuro para el sidebar */
     color: #f7fafc;
-    /* Texto blanco */
     padding: 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    transition: transform 0.3s ease-in-out;
+    /* Transición para el efecto de deslizar */
+    flex-shrink: 0;
+    /* Evita que el sidebar se encoja */
 }
 
 .sidebarTitle {
     font-weight: bold;
     font-size: 1.5rem;
+    margin-bottom: 1rem;
+    /* Espacio debajo del título */
 }
 
 .sidebarNav {
@@ -36,7 +42,8 @@
     text-decoration: none;
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
-    /* Para indicar que es interactivo */
+    display: block;
+    /* Asegura que el enlace ocupe todo el espacio del li */
 }
 
 .sidebarLink:hover {
@@ -51,17 +58,51 @@
     text-decoration: none;
     text-align: center;
     transition: background-color 0.15s ease-in-out;
+    display: block;
+    /* Asegura que el botón ocupe todo el espacio del li */
+    margin-top: 1.5rem;
+    /* Espacio superior para separar del menú */
 }
 
 .downloadButton:hover {
     background-color: #38a169;
 }
 
+/* Contenido Principal */
 .mainContent {
     flex-grow: 1;
     background-color: #edf2f7;
-    /* Un color claro para el contenido principal */
-    padding: 1rem;
+    padding: 1.5rem;
+    /* Aumentado a p-6 para que coincida con el dashboard page.tsx */
+    overflow-y: auto;
+    /* Para permitir el scroll si el contenido es largo */
+}
+
+/* Botón de Menú (hamburguesa) para móviles */
+.menuButton {
+    position: fixed;
+    /* Fijo en la pantalla */
+    top: 1rem;
+    left: 1rem;
+    z-index: 60;
+    /* Por encima del sidebar */
+    background-color: #2d3748;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    display: none;
+    /* Oculto por defecto en desktop */
+    font-size: 1.5rem;
+    line-height: 1;
+    /* Para centrar el icono */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.menuButton:hover {
+    background-color: #4a5568;
 }
 
 /* Estilos para el modal */
@@ -72,10 +113,85 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Fondo oscuro con opacidad */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 50;
-    /* Asegura que esté por encima de todo */
+}
+
+/* --- Media Queries para Responsividad --- */
+
+/* Pantallas grandes (desktop, tablets grandes) */
+@media (min-width: 768px) {
+    .sidebar {
+        transform: translateX(0%);
+        /* Sidebar visible por defecto */
+        position: relative;
+        /* Vuelve a su flujo normal */
+    }
+
+    .mainContent {
+        margin-left: 0;
+        /* No hay margen adicional */
+    }
+
+    .menuButton {
+        display: none;
+        /* Asegura que el botón de menú esté oculto en desktop */
+    }
+}
+
+/* Pantallas pequeñas (móviles) */
+@media (max-width: 767px) {
+    .sidebar {
+        position: fixed;
+        /* Fijo para que se deslice */
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 50;
+        /* Por encima del contenido, debajo del botón de menú */
+        transform: translateX(-100%);
+        /* Oculto por defecto */
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        /* Sombra para el efecto de deslizar */
+    }
+
+    .sidebar.show {
+        transform: translateX(0%);
+        /* Muestra el sidebar */
+    }
+
+    .mainContent {
+        width: 100%;
+        /* Ocupa todo el ancho */
+        padding-top: 4.5rem;
+        /* Deja espacio para el botón de menú */
+        margin-left: 0;
+        /* Asegura que no haya margen del sidebar */
+    }
+
+    .menuButton {
+        display: block;
+        /* Muestra el botón de menú en móviles */
+    }
+
+    /* Capa de superposición cuando el sidebar está abierto en móviles */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 49;
+        /* Debajo del sidebar pero encima del contenido */
+        display: none;
+        /* Oculto por defecto */
+    }
+
+    .overlay.show {
+        display: block;
+        /* Muestra la superposición */
+    }
 }

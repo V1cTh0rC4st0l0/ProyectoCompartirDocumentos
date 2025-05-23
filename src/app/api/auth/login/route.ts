@@ -1,9 +1,9 @@
-// src/app/api/auth/login/route.ts
 import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import User from '@/models/User'
 import { connectDB } from '@/lib/mongodb'
+import { cookies } from 'next/headers'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'clave_secreta_temporal'
 
@@ -23,10 +23,16 @@ export async function POST(req: Request) {
 
     const token = jwt.sign({ id: user._id, rol: user.rol }, JWT_SECRET, { expiresIn: '1d' })
 
-    const response = NextResponse.json({ message: 'Login exitoso', rol: user.rol })
-    response.headers.set(
-        'Set-Cookie',
-        `token=${token}; HttpOnly; Path=/; Max-Age=86400; Secure; SameSite=Strict`
-    )
-    return response
+        // ✅ Usa la API oficial para setear cookies
+        ; (await
+            // ✅ Usa la API oficial para setear cookies
+            cookies()).set('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax', // o 'strict' si todo es mismo dominio
+                path: '/',
+                maxAge: 60 * 60 * 24,
+            })
+
+    return NextResponse.json({ message: 'Login exitoso', rol: user.rol })
 }

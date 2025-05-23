@@ -10,6 +10,9 @@ import Link from 'next/link';
 import { FiDownload, FiFile, FiImage, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 
+// Importa los estilos CSS Module
+import styles from '@/styles/dashboard.module.css';
+
 type File = {
     fileId: string;
     nombreArchivo: string;
@@ -30,7 +33,9 @@ export default function DashboardPage() {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const res = await axios.get('/api/file-groups/compartidos-conmigo');
+                const res = await axios.get('/api/file-groups/compartidos-conmigo', {
+                    withCredentials: true,
+                });
 
                 if (Array.isArray(res.data)) {
                     setFileGroups(res.data);
@@ -81,7 +86,7 @@ export default function DashboardPage() {
                     alt={file.nombreArchivo}
                     width={100}
                     height={100}
-                    className="rounded shadow object-cover h-[100px] w-full"
+                    className={styles.iconImage} // Aplicar clase CSS para la imagen
                 />
             );
         }
@@ -113,40 +118,40 @@ export default function DashboardPage() {
     };
 
     return (
-        <> {/* Ya no necesitas el div principal del flex, lo maneja el layout */}
-            <h1 className="text-2xl font-bold mb-6">Archivos compartidos contigo</h1>
+        <div className={styles.dashboardContainer}>
+            <h1 className={styles.title}>Archivos compartidos con Usted</h1>
 
             {loading ? (
-                <p className="text-gray-600">Cargando archivos...</p>
+                <p className={styles.loadingMessage}>Cargando archivos...</p>
             ) : error ? (
-                <p className="text-red-500">{error}</p>
+                <p className={styles.errorMessage}>{error}</p>
             ) : fileGroups.length === 0 ? (
-                <p className="text-gray-600">No hay grupos de archivos compartidos contigo.</p>
+                <p className={styles.noFilesMessage}>No hay grupos de archivos compartidos con Usted.</p>
             ) : (
                 fileGroups.map((group) => (
-                    <div key={group._id} className="mb-6 border p-4 rounded shadow bg-white">
-                        <div className="flex justify-between items-center mb-2">
-                            <h2 className="text-lg font-semibold">{group.nombreGrupo}</h2>
+                    <div key={group._id} className={styles.fileGroup}>
+                        <div className={styles.groupHeader}>
+                            <h2 className={styles.groupTitle}>{group.nombreGrupo}</h2>
                             <button
                                 onClick={() => handleDownloadGroup(group._id, group.nombreGrupo)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center text-sm"
+                                className={styles.downloadGroupButton}
                             >
                                 <FiDownload className="mr-2" /> Descargar Grupo
                             </button>
                         </div>
-                        <div className="flex flex-wrap gap-4">
+                        <div className={styles.filesGrid}>
                             {group.archivos.map((file) => (
                                 <div
                                     key={file.fileId}
-                                    className="w-[120px] text-center p-2 border rounded bg-gray-50 hover:bg-gray-100 transition duration-200 ease-in-out flex flex-col justify-between items-center"
+                                    className={styles.fileCard}
                                 >
-                                    <div className="flex-grow flex items-center justify-center">
+                                    <div className={styles.fileIconContainer}>
                                         {renderFileIcon(file)}
                                     </div>
-                                    <p className="text-sm mt-2 truncate w-full px-1">{file.nombreArchivo}</p>
+                                    <p className={styles.fileName}>{file.nombreArchivo}</p>
                                     <button
                                         onClick={() => handleDownloadFile(file.fileId, file.nombreArchivo)}
-                                        className="mt-2 bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-full text-xs flex items-center justify-center w-full"
+                                        className={styles.downloadFileButton}
                                     >
                                         <FiDownload className="mr-1" /> Descargar
                                     </button>
@@ -156,6 +161,6 @@ export default function DashboardPage() {
                     </div>
                 ))
             )}
-        </>
+        </div>
     );
 }

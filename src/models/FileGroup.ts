@@ -4,7 +4,7 @@ const archivoSchema = new mongoose.Schema({
     fileId: { type: mongoose.Schema.Types.ObjectId, required: true },
     nombreArchivo: { type: String, required: true },
     tipoArchivo: { type: String, required: true },
-}, { _id: false });
+});
 
 const fileGroupSchema = new mongoose.Schema({
     nombreGrupo: { type: String, required: true },
