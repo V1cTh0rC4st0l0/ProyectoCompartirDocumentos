@@ -1,7 +1,8 @@
 {
     "functions": {
-        "api/file-groups/upload.ts": {
-            "maxDuration": 90,
+        "api/file-groups/upload": {
+            "runtime": "nodejs18.x",
+            "maxDuration": 60,
             "memory": 1024,
             "maxRequestBodySize": "150mb"
         }
