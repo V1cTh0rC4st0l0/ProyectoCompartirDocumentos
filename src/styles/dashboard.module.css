@@ -1,335 +1,271 @@
-/* Estilos Generales del Dashboard */
+/* src/styles/dashboard.module.css */
+
 .dashboardContainer {
-    padding: 1.5rem;
-    /* Equivalente a p-6 en Tailwind */
-    background-color: #f8fafc;
-    /* Un gris muy claro, como bg-slate-50 o bg-gray-50 */
-    min-height: 100vh;
-    /* Asegura que ocupe al menos la altura de la vista */
-    font-family: 'Inter', sans-serif;
-    /* Puedes ajustar la fuente si usas Google Fonts */
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .title {
-    font-size: 2rem;
-    /* Equivalente a text-3xl */
-    font-weight: 700;
-    /* Equivalente a font-bold */
-    margin-bottom: 1.5rem;
-    /* Equivalente a mb-6 */
-    color: #1a202c;
-    /* Un color oscuro para el texto, como text-gray-900 */
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
-/* Mensajes de Estado (Cargando, Error, No hay archivos) */
 .loadingMessage,
 .errorMessage,
 .noFilesMessage {
-    font-size: 1.125rem;
-    /* Equivalente a text-lg */
-    color: #4a5568;
-    /* Un gris medio, como text-gray-600 */
     text-align: center;
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 0.5rem;
-    background-color: #ffffff;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    /* Sombra ligera */
+    font-size: 1.1rem;
+    margin-top: 2rem;
+}
+
+.loadingMessage {
+    background-color: #e2e8f0;
+    color: #4a5568;
 }
 
 .errorMessage {
+    background-color: #ffe6e6;
     color: #e53e3e;
-    /* Rojo de error, como text-red-500 */
     border: 1px solid #e53e3e;
-    background-color: #fef2f2;
 }
 
-/* Estilos para cada Grupo de Archivos */
+.noFilesMessage {
+    background-color: #edf2f7;
+    color: #4a5568;
+}
+
 .fileGroup {
-    margin-bottom: 1.5rem;
-    /* Equivalente a mb-6 */
-    border: 1px solid #e2e8f0;
-    /* Color de borde, como border */
-    padding: 1rem;
-    /* Equivalente a p-4 */
-    border-radius: 0.5rem;
-    /* Equivalente a rounded */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    /* Equivalente a shadow */
-    background-color: #ffffff;
-    /* Fondo blanco, como bg-white */
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .groupHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
-    /* Equivalente a mb-3 */
+    margin-bottom: 1.5rem;
     flex-wrap: wrap;
     /* Permite que los elementos se envuelvan en pantallas pequeñas */
-    gap: 0.5rem;
-    /* Espacio entre elementos cuando se envuelven */
+    gap: 1rem;
+    /* Espacio entre título y botón */
 }
 
 .groupTitle {
-    font-size: 1.25rem;
-    /* Equivalente a text-xl */
-    font-weight: 600;
-    /* Equivalente a font-semibold */
-    color: #2d3748;
-    /* Un color oscuro para el título del grupo */
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #2b6cb0;
+    /* Un color distintivo para el título del grupo */
+    flex-grow: 1;
+    /* Permite que el título ocupe el espacio disponible */
 }
 
 .downloadGroupButton {
-    background-color: #3b82f6;
-    /* Azul, como bg-blue-500 */
+    background-color: #4299e1;
+    /* Azul de Tailwind CSS */
     color: white;
-    padding: 0.5rem 1rem;
-    /* px-4 py-2 */
+    padding: 0.75rem 1.25rem;
+    border: none;
     border-radius: 0.375rem;
-    /* rounded */
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    font-size: 0.875rem;
-    /* text-sm */
+    gap: 0.5rem;
     transition: background-color 0.2s ease-in-out;
 }
 
 .downloadGroupButton:hover {
-    background-color: #2563eb;
-    /* Azul más oscuro, como hover:bg-blue-600 */
+    background-color: #2b6cb0;
 }
 
-.downloadGroupButton svg {
-    margin-right: 0.5rem;
-    /* mr-2 */
-}
-
-/* Contenedor de Archivos Individuales */
 .filesGrid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    /* Ajusta minmax para controlar el tamaño de las tarjetas y el número de columnas */
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    /* Más espacio para los nombres de archivo */
     gap: 1rem;
-    /* Equivalente a gap-4 */
-    justify-content: flex-start;
-    /* Alinea los elementos al inicio */
+    /* Espacio entre las tarjetas */
 }
 
-/* Estilos para cada Tarjeta de Archivo Individual */
 .fileCard {
-    width: 120px;
-    /* Ancho fijo para cada tarjeta */
-    text-align: center;
-    padding: 0.75rem;
-    /* p-3 */
+    background-color: #f7fafc;
     border: 1px solid #e2e8f0;
-    /* border */
-    border-radius: 0.375rem;
-    /* rounded */
-    background-color: #f9fafb;
-    /* bg-gray-50 */
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+    border-radius: 0.5rem;
+    padding: 1rem 0.5rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    /* Sombra muy ligera */
+    text-align: center;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease-in-out;
+    min-height: 150px;
+    /* Mantener la altura para consistencia */
+    justify-content: space-between;
+    /* Empuja el botón de descarga hacia abajo */
 }
 
 .fileCard:hover {
-    background-color: #f3f4f6;
-    /* hover:bg-gray-100 */
-    transform: translateY(-2px);
-    /* Efecto ligero al pasar el ratón */
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .fileIconContainer {
-    flex-grow: 1;
-    /* Permite que el icono o imagen crezca */
+    margin-bottom: 0.5rem;
     display: flex;
-    align-items: center;
     justify-content: center;
-    width: 100%;
-    /* Asegura que el contenedor del icono o imagen ocupe el ancho completo */
-    min-height: 80px;
-    /* Altura mínima para asegurar espacio para iconos grandes */
-}
-
-/* Estilos específicos para iconos */
-.fileIconContainer svg {
-    margin: auto;
-    /* Centra los iconos */
+    align-items: center;
+    height: 70px;
+    /* Altura fija para los contenedores de iconos/imágenes */
 }
 
 .iconImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     border-radius: 0.25rem;
-    /* rounded */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    /* shadow */
-    object-fit: cover;
-    height: 100px;
-    /* h-[100px] */
-    width: 100%;
-    /* w-full */
 }
 
 .fileName {
-    font-size: 0.875rem;
-    /* text-sm */
-    margin-top: 0.5rem;
-    /* mt-2 */
-    white-space: nowrap;
-    /* truncate */
-    overflow: hidden;
-    /* truncate */
-    text-overflow: ellipsis;
-    /* truncate */
-    width: 100%;
-    /* w-full */
-    padding: 0 0.25rem;
-    /* px-1 */
+    font-size: 0.85rem;
     color: #2d3748;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .downloadFileButton {
-    margin-top: 0.75rem;
-    /* mt-3 */
-    background-color: #10b981;
-    /* Verde, como bg-green-500 */
+    background-color: #38a169;
     color: white;
-    padding: 0.25rem 0.75rem;
-    /* px-3 py-1 */
-    border-radius: 9999px;
-    /* rounded-full */
-    font-size: 0.75rem;
-    /* text-xs */
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    /* w-full */
+    gap: 0.25rem;
+    width: fit-content;
+    margin-top: auto;
+    /* Empuja el botón hacia la parte inferior de la tarjeta */
     transition: background-color 0.2s ease-in-out;
 }
 
 .downloadFileButton:hover {
-    background-color: #059669;
-    /* Verde más oscuro, como hover:bg-green-600 */
+    background-color: #2f855a;
 }
 
-.downloadFileButton svg {
-    margin-right: 0.25rem;
-    /* mr-1 */
+/* **Nuevos estilos para el "Ver más"** */
+.viewMoreCard {
+    background-color: #edf2f7;
+    /* Fondo más claro para el "Ver más" */
+    border: 1px solid #cbd5e0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    min-height: 150px;
+    /* Igualar altura a las fileCard */
 }
 
-/* --- Media Queries para Responsividad --- */
+.viewMoreCard:hover {
+    transform: translateY(-3px);
+    background-color: #e2e8f0;
+    /* Un poco más oscuro al pasar el ratón */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
 
-/* Pantallas pequeñas (móviles) */
-@media (max-width: 639px) {
+.viewMoreText {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.viewMoreIcon {
+    font-size: 2rem;
+    color: #2b6cb0;
+    font-weight: bold;
+}
+
+
+/* Responsividad */
+@media (max-width: 768px) {
     .dashboardContainer {
         padding: 1rem;
-        /* Menos padding en móviles */
     }
 
     .title {
-        font-size: 1.75rem;
-        /* text-2xl en móviles */
-        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .fileGroup {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .groupHeader {
         flex-direction: column;
-        /* Apila el título y el botón de descarga */
-        align-items: center;
-        /* Centra los elementos apilados */
-        text-align: center;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 
     .groupTitle {
-        font-size: 1.125rem;
-        /* text-lg en móviles */
-        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
     }
 
     .downloadGroupButton {
         width: 100%;
-        /* Botón de descarga de grupo ocupa todo el ancho */
         justify-content: center;
-        padding: 0.75rem 1rem;
-        /* Un poco más de padding para que sea más fácil de tocar */
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
 
     .filesGrid {
-        justify-content: center;
-        /* Centra las tarjetas de archivo en pantallas pequeñas */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.8rem;
     }
 
-    .fileCard {
-        width: 100px;
-        /* Un poco más pequeñas en móviles */
-        padding: 0.5rem;
-    }
-
-    .fileIconContainer {
-        min-height: 70px;
-        /* Ajuste de altura mínima */
-    }
-
-    .iconImage {
-        height: 80px;
-        /* Imágenes más pequeñas */
+    .fileCard,
+    .viewMoreCard {
+        padding: 0.75rem 0.4rem;
+        min-height: 130px;
     }
 
     .fileName {
         font-size: 0.75rem;
-        /* texto más pequeño */
     }
 
     .downloadFileButton {
-        font-size: 0.625rem;
-        /* texto muy pequeño */
-        padding: 0.2rem 0.5rem;
-    }
-}
-
-/* Pantallas medianas (tabletas) */
-@media (min-width: 640px) and (max-width: 1023px) {
-    .title {
-        font-size: 2rem;
-        /* text-3xl */
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
     }
 
-    .fileCard {
-        width: 110px;
-        /* Ligeramente más pequeñas que en desktop */
+    .viewMoreText {
+        font-size: 0.8rem;
     }
 
-    .filesGrid {
-        justify-content: flex-start;
-        /* Se mantiene la alineación a la izquierda */
-    }
-}
-
-/* Pantallas grandes (desktop) */
-@media (min-width: 1024px) {
-    .title {
-        font-size: 2.25rem;
-        /* text-4xl */
-    }
-
-    .fileGroup {
-        padding: 1.5rem;
-        /* Un poco más de padding */
-    }
-
-    .groupTitle {
-        font-size: 1.5rem;
-        /* text-2xl */
-    }
-
-    .fileCard {
-        width: 120px;
-        /* Tamaño original */
+    .viewMoreIcon {
+        font-size: 1.8rem;
     }
 }

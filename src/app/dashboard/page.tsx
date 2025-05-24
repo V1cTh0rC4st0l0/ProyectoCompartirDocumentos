@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 import styles from '@/styles/dashboard.module.css';
+import FileGroupModal from '@/components/FileGroupModal'; // Importar el nuevo modal
 
 type FileData = {
     fileId: string;
@@ -25,6 +26,11 @@ export default function DashboardPage() {
     const [fileGroups, setFileGroups] = useState<FileGroup[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<FileGroup | null>(null);
+
+    // Límite de archivos a mostrar por grupo en la vista inicial
+    const GROUP_FILE_DISPLAY_LIMIT = 2; // Mostrar solo 2 archivos por grupo inicialmente
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -84,6 +90,16 @@ export default function DashboardPage() {
             return;
         }
         window.location.href = `/api/files/${fileId}`;
+    };
+
+    const handleOpenModal = (group: FileGroup) => {
+        setSelectedGroup(group);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedGroup(null);
     };
 
     const renderFileIcon = (file: FileData) => {
@@ -148,7 +164,7 @@ export default function DashboardPage() {
                             </button>
                         </div>
                         <div className={styles.filesGrid}>
-                            {group.archivos.map((file) => (
+                            {group.archivos.slice(0, GROUP_FILE_DISPLAY_LIMIT).map((file) => (
                                 <div
                                     key={file.fileId}
                                     className={styles.fileCard}
@@ -165,9 +181,19 @@ export default function DashboardPage() {
                                     </button>
                                 </div>
                             ))}
+                            {group.archivos.length > GROUP_FILE_DISPLAY_LIMIT && (
+                                <div className={styles.viewMoreCard} onClick={() => handleOpenModal(group)}>
+                                    <p className={styles.viewMoreText}>Ver {group.archivos.length - GROUP_FILE_DISPLAY_LIMIT} archivo(s) más</p>
+                                    <p className={styles.viewMoreIcon}>+</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))
+            )}
+
+            {isModalOpen && selectedGroup && (
+                <FileGroupModal group={selectedGroup} onClose={handleCloseModal} />
             )}
         </div>
     );

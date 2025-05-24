@@ -1,0 +1,9 @@
+{
+    "functions": {
+        "api/file-groups/upload.ts": {
+            "maxDuration": 90,
+            "memory": 1024,
+            "maxRequestBodySize": "150mb"
+        }
+    }
+}

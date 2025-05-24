@@ -25,6 +25,9 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
     const [message, setMessage] = useState(''); // Para mensajes de éxito/error
     const [isSuccess, setIsSuccess] = useState<boolean | null>(null); // Para el estilo del mensaje
 
+    // Límite de archivos a mostrar
+    const FILE_DISPLAY_LIMIT = 5; // Puedes ajustar este número según tus necesidades
+
     useEffect(() => {
         const fetchUsuarios = async () => {
             try {
@@ -173,9 +176,19 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
                         required={!files || files.length === 0} // Hace que sea requerido si no hay archivos seleccionados
                     />
                     {files && files.length > 0 && (
-                        <p className={styles.filesSelectedText}>
-                            Archivos seleccionados: {Array.from(files).map(f => f.name).join(', ')}
-                        </p>
+                        <div className={styles.filesSelectedContainer}> {/* Nuevo contenedor para la lista de archivos */}
+                            <p className={styles.filesSelectedText}>Archivos seleccionados:</p>
+                            <ul className={styles.fileList}>
+                                {Array.from(files).slice(0, FILE_DISPLAY_LIMIT).map((f, index) => (
+                                    <li key={index} className={styles.fileListItem}>{f.name}</li>
+                                ))}
+                                {files.length > FILE_DISPLAY_LIMIT && (
+                                    <li className={styles.fileListItem}>
+                                        Y {files.length - FILE_DISPLAY_LIMIT} archivo(s) más...
+                                    </li>
+                                )}
+                            </ul>
+                        </div>
                     )}
                 </div>
 

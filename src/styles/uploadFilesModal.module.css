@@ -9,7 +9,6 @@
     min-width: 350px;
     max-width: 90%;
     width: 500px;
-    /* Un poco más ancho que el de crear usuario, si lo prefieres */
     box-sizing: border-box;
 }
 
@@ -47,9 +46,7 @@
     font-size: 1rem;
     width: 100%;
     box-sizing: border-box;
-    /* Estilos específicos para el input de archivo */
     background-color: #f7fafc;
-    /* Fondo ligero */
     cursor: pointer;
 }
 
@@ -69,7 +66,6 @@
 .userDropdown {
     position: absolute;
     top: 100%;
-    /* Justo debajo del input */
     left: 0;
     width: 100%;
     background-color: #fff;
@@ -79,7 +75,12 @@
     max-height: 150px;
     overflow-y: auto;
     z-index: 20;
-    /* Asegura que esté por encima de otros elementos */
+    list-style: none;
+    /* Agregado para eliminar los puntos de la lista */
+    padding: 0;
+    /* Agregado para quitar el padding por defecto */
+    margin: 0;
+    /* Agregado para quitar el margen por defecto */
 }
 
 .dropdownItem {
@@ -94,7 +95,6 @@
 }
 
 .dropdownItem.selected {
-    /* Clase para el item seleccionado */
     background-color: #ebf8ff;
     font-weight: 600;
 }
@@ -103,14 +103,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Espacio entre el texto y el botón */
     background-color: #e2e8f0;
     padding: 0.75rem 1rem;
     border-radius: 0.375rem;
     font-size: 0.95rem;
     color: #2d3748;
     margin-top: -0.5rem;
-    /* Ajusta si hay mucho espacio con el input */
 }
 
 .selectedUsername {
@@ -134,12 +132,56 @@
     color: #e53e3e;
 }
 
-.filesSelectedText {
-    font-size: 0.85rem;
-    color: #718096;
-    margin-top: 0.5rem;
-    line-height: 1.4;
+/* **Nuevos estilos para la lista de archivos seleccionados** */
+.filesSelectedContainer {
+    margin-top: 0.75rem;
+    /* Ajusta el margen superior si lo necesitas */
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    /* Color de borde similar a tus inputs */
+    border-radius: 0.375rem;
+    /* Radio de borde similar a tus inputs */
+    background-color: #f7fafc;
+    /* Fondo ligero similar a tus inputs */
+    max-height: 120px;
+    /* Altura máxima para la lista de archivos */
+    overflow-y: auto;
+    /* Permite desplazamiento vertical si la lista es muy larga */
 }
+
+.filesSelectedText {
+    font-size: 0.9rem;
+    /* Mantén el tamaño de fuente si es diferente al de la lista */
+    color: #4a5568;
+    /* Color similar a tus labels */
+    font-weight: 600;
+    /* Puedes hacerlo un poco más fuerte */
+    margin-bottom: 0.5rem;
+    /* Espacio debajo del título "Archivos seleccionados" */
+}
+
+.fileList {
+    list-style: none;
+    /* Elimina los puntos de la lista por defecto */
+    padding: 0;
+    margin: 0;
+}
+
+.fileListItem {
+    padding: 0.2rem 0;
+    /* Espaciado interno para cada nombre de archivo */
+    color: #2d3748;
+    /* Color de texto similar al general */
+    font-size: 0.85rem;
+    /* Tamaño de fuente para los nombres de archivo */
+    white-space: nowrap;
+    /* Evita que el texto se rompa en varias líneas */
+    overflow: hidden;
+    /* Oculta el texto que se desborda */
+    text-overflow: ellipsis;
+    /* Añade puntos suspensivos (...) al final */
+}
+
 
 .buttonGroup {
     display: flex;
@@ -150,7 +192,6 @@
 
 .submitButton {
     background-color: #38a169;
-    /* Verde de Tailwind CSS */
     color: white;
     padding: 0.75rem 1.5rem;
     border: none;
@@ -239,5 +280,14 @@
         width: 100%;
         padding: 0.8rem;
         font-size: 0.95rem;
+    }
+
+    /* Ajuste para la lista de archivos en pantallas pequeñas */
+    .filesSelectedContainer {
+        padding: 0.6rem;
+    }
+
+    .fileListItem {
+        font-size: 0.8rem;
     }
 }

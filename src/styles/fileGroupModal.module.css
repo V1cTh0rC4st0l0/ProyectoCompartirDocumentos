@@ -1,0 +1,240 @@
+/* src/styles/fileGroupModal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Fondo semi-transparente oscuro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Asegura que esté por encima de todo */
+}
+
+.modalContent {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.2), 0 4px 8px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    min-width: 400px;
+    /* Un poco más ancho para la cuadrícula de archivos */
+    max-width: 80%;
+    /* Máximo ancho en pantalla */
+    max-height: 90vh;
+    /* Máxima altura para el scroll */
+    overflow-y: auto;
+    /* Habilita el scroll dentro del modal si el contenido es largo */
+    position: relative;
+    box-sizing: border-box;
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.closeButton:hover {
+    color: #e53e3e;
+    /* Rojo de error al pasar el ratón */
+}
+
+.modalTitle {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #2d3748;
+    text-align: center;
+}
+
+.modalHeaderActions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+.downloadGroupButton {
+    background-color: #4299e1;
+    /* Azul de Tailwind CSS */
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.downloadGroupButton:hover {
+    background-color: #2b6cb0;
+}
+
+.filesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    /* Columnas más pequeñas para mostrar más archivos */
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.fileCard {
+    background-color: #f7fafc;
+    /* Fondo ligero para cada tarjeta */
+    border: 1px solid #e2e8f0;
+    /* Borde suave */
+    border-radius: 0.5rem;
+    padding: 1rem 0.5rem;
+    /* Menos padding horizontal para nombres largos */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease-in-out;
+    min-height: 150px;
+    /* Altura mínima para que todas las tarjetas sean consistentes */
+    justify-content: space-between;
+    /* Empuja el botón de descarga hacia abajo */
+}
+
+.fileCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.fileIconContainer {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    /* Altura fija para los contenedores de iconos/imágenes */
+}
+
+.iconImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Para que la imagen se ajuste sin distorsionarse */
+    border-radius: 0.25rem;
+}
+
+/* Estilos para los iconos SVG (FiDownload, FaFilePdf, etc.) */
+.iconPdf,
+.iconArchive,
+.iconText,
+.iconDefault {
+    font-size: 3.5rem;
+    /* Ajusta el tamaño para que coincida con las imágenes */
+    margin: auto;
+    color: #e53e3e;
+    /* Ejemplo de color rojo para PDF */
+}
+
+.iconArchive {
+    color: #dd6b20;
+}
+
+/* Naranja para archivos comprimidos */
+.iconText {
+    color: #4299e1;
+}
+
+/* Azul para archivos de texto */
+.iconDefault {
+    color: #a0aec0;
+}
+
+/* Gris para archivos genéricos */
+.iconEmoji {
+    font-size: 3rem;
+    /* Tamaño para emojis */
+    margin: auto;
+}
+
+
+.fileName {
+    font-size: 0.85rem;
+    color: #2d3748;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    /* Evita que el nombre del archivo se rompa */
+    overflow: hidden;
+    /* Oculta el texto desbordado */
+    text-overflow: ellipsis;
+    /* Añade puntos suspensivos */
+    width: 100%;
+    /* Asegura que ocupe todo el ancho disponible para el ellipsis */
+}
+
+.downloadFileButton {
+    background-color: #38a169;
+    /* Verde de Tailwind CSS */
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: fit-content;
+    /* Se ajusta al contenido */
+    margin-top: auto;
+    /* Empuja el botón hacia la parte inferior de la tarjeta */
+    transition: background-color 0.2s ease-in-out;
+}
+
+.downloadFileButton:hover {
+    background-color: #2f855a;
+}
+
+/* Responsividad para el modal */
+@media (max-width: 768px) {
+    .modalContent {
+        width: 95%;
+        padding: 1.5rem;
+        min-width: unset;
+    }
+
+    .modalTitle {
+        font-size: 1.5rem;
+    }
+
+    .filesGrid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.8rem;
+    }
+
+    .fileCard {
+        padding: 0.75rem 0.4rem;
+        min-height: 130px;
+    }
+
+    .fileName {
+        font-size: 0.75rem;
+    }
+
+    .downloadFileButton {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+    }
+}
