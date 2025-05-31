@@ -33,8 +33,6 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
                 setUsername('')
                 setPassword('')
                 setRol('usuario')
-                // Opcional: Cerrar el modal después de un tiempo o que el usuario haga clic en cerrar
-                // setTimeout(onClose, 2000);
             } else {
                 setMessage(data.message || 'Error al crear usuario.')
                 setIsSuccess(false);

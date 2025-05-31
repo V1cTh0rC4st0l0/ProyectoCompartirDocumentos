@@ -2,8 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import styles from '@/styles/uploadFilesModal.module.css'; // Importa los nuevos estilos
-import { AiOutlineClose } from 'react-icons/ai'; // Para el botón de cerrar
+import styles from '@/styles/uploadFilesModal.module.css';
+import { AiOutlineClose } from 'react-icons/ai';
 
 type Usuario = {
     _id: string;
@@ -14,19 +14,25 @@ interface UploadFilesModalProps {
     onClose: () => void;
 }
 
+interface GrupoApi {
+    _id: string;
+    nombreGrupo: string;
+}
+
 export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
     const [files, setFiles] = useState<FileList | null>(null);
     const [nombreGrupo, setNombreGrupo] = useState('');
-    const [compartidoConId, setCompartidoConId] = useState(''); // ID del usuario con el que se comparte
-    const [compartidoConUsername, setCompartidoConUsername] = useState(''); // Nombre del usuario seleccionado
+    const [compartidoConId, setCompartidoConId] = useState('');
+    const [compartidoConUsername, setCompartidoConUsername] = useState('');
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [search, setSearch] = useState('');
     const [filteredUsuarios, setFilteredUsuarios] = useState<Usuario[]>([]);
-    const [message, setMessage] = useState(''); // Para mensajes de éxito/error
-    const [isSuccess, setIsSuccess] = useState<boolean | null>(null); // Para el estilo del mensaje
+    const [message, setMessage] = useState('');
+    const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
+    const [gruposExistentes, setGruposExistentes] = useState<string[]>([]);
+    const [grupoSuggestions, setGrupoSuggestions] = useState<string[]>([]);
 
-    // Límite de archivos a mostrar
-    const FILE_DISPLAY_LIMIT = 5; // Puedes ajustar este número según tus necesidades
+    const FILE_DISPLAY_LIMIT = 5;
 
     useEffect(() => {
         const fetchUsuarios = async () => {
@@ -45,17 +51,41 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
     useEffect(() => {
         setFilteredUsuarios(
             usuarios.filter((u) =>
-                u.username.toLowerCase().includes(search.toLowerCase()) && u._id !== compartidoConId // Filtra y no muestra el ya seleccionado
+                u.username.toLowerCase().includes(search.toLowerCase()) && u._id !== compartidoConId
             )
         );
     }, [search, usuarios, compartidoConId]);
 
-    const handleSelectUsuario = (usuario: Usuario) => {
+    const handleSelectUsuario = async (usuario: Usuario) => {
         setCompartidoConId(usuario._id);
         setCompartidoConUsername(usuario.username);
-        setSearch(usuario.username); // Para que el input de búsqueda muestre el nombre del usuario seleccionado
-        setFilteredUsuarios([]); // Limpiar la lista de resultados de búsqueda
+        setSearch(usuario.username);
+        setFilteredUsuarios([]);
+
+        try {
+            const res = await fetch(`/api/file-groups/by-user/${usuario._id}`);
+            const data = await res.json();
+            const nombresDeGrupos = data.grupos
+                .filter((grupo: GrupoApi) => grupo && typeof grupo.nombreGrupo === 'string')
+                .map((grupo: GrupoApi) => grupo.nombreGrupo);
+            setGruposExistentes(nombresDeGrupos);
+        } catch (error) {
+            console.error('Error al obtener grupos existentes:', error);
+            setGruposExistentes([]);
+        }
     };
+    useEffect(() => {
+        if (!nombreGrupo || gruposExistentes.length === 0) {
+            setGrupoSuggestions([]);
+            return;
+        }
+
+        const coincidencias = gruposExistentes.filter((grupo) =>
+            grupo.toLowerCase().includes(nombreGrupo.toLowerCase())
+        );
+        setGrupoSuggestions(coincidencias);
+    }, [nombreGrupo, gruposExistentes]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,8 +103,8 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
             formData.append('archivos', file);
         }
         formData.append('nombreGrupo', nombreGrupo);
-        formData.append('usuarioId', compartidoConId); // Asumiendo que `usuarioId` es el ID del usuario que sube el archivo
-        formData.append('compartidoCon', compartidoConId); // Asumiendo que `compartidoCon` es el ID del usuario con quien se comparte
+        formData.append('usuarioId', compartidoConId);
+        formData.append('compartidoCon', compartidoConId);
 
         try {
             const res = await fetch('/api/file-groups/upload', {
@@ -113,19 +143,6 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
             <h2 className={styles.modalTitle}>Subir Grupo de Archivos</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.inputGroup}>
-                    <label htmlFor="nombreGrupo" className={styles.label}>Nombre del Grupo</label>
-                    <input
-                        type="text"
-                        id="nombreGrupo"
-                        placeholder="Ej. Estudio de Rayos X Enero"
-                        value={nombreGrupo}
-                        onChange={(e) => setNombreGrupo(e.target.value)}
-                        className={styles.input}
-                        required
-                    />
-                </div>
-
-                <div className={styles.inputGroup}>
                     <label htmlFor="searchUser" className={styles.label}>Compartir con Usuario</label>
                     <div className={styles.relativeContainer}>
                         <input
@@ -136,7 +153,7 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
                             onChange={(e) => setSearch(e.target.value)}
                             className={styles.input}
                         />
-                        {filteredUsuarios.length > 0 && search.length > 0 && ( // Solo muestra si hay búsqueda y resultados
+                        {filteredUsuarios.length > 0 && search.length > 0 && (
                             <ul className={styles.userDropdown}>
                                 {filteredUsuarios.map((usuario) => (
                                     <li
@@ -164,6 +181,37 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
                         </button>
                     </p>
                 )}
+                <div className={styles.inputGroup}>
+                    <label htmlFor="nombreGrupo" className={styles.label}>Nombre del Grupo</label>
+                    <div className={styles.relativeContainer}>
+                        <input
+                            type="text"
+                            id="nombreGrupo"
+                            placeholder="Ej. Estudio de Rayos X Enero"
+                            value={nombreGrupo}
+                            onChange={(e) => setNombreGrupo(e.target.value)}
+                            className={styles.input}
+                            required
+                            autoComplete="off"
+                        />
+                        {grupoSuggestions.length > 0 && (
+                            <ul className={styles.userDropdown}>
+                                {grupoSuggestions.map((grupo, index) => (
+                                    <li
+                                        key={index}
+                                        onClick={() => {
+                                            setNombreGrupo(grupo);
+                                            setGrupoSuggestions([]);
+                                        }}
+                                        className={styles.dropdownItem}
+                                    >
+                                        {grupo}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                </div>
 
                 <div className={styles.inputGroup}>
                     <label htmlFor="file-upload-input" className={styles.label}>Seleccionar Archivos</label>
@@ -173,10 +221,10 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
                         multiple
                         onChange={(e) => setFiles(e.target.files)}
                         className={styles.fileInput}
-                        required={!files || files.length === 0} // Hace que sea requerido si no hay archivos seleccionados
+                        required={!files || files.length === 0}
                     />
                     {files && files.length > 0 && (
-                        <div className={styles.filesSelectedContainer}> {/* Nuevo contenedor para la lista de archivos */}
+                        <div className={styles.filesSelectedContainer}>
                             <p className={styles.filesSelectedText}>Archivos seleccionados:</p>
                             <ul className={styles.fileList}>
                                 {Array.from(files).slice(0, FILE_DISPLAY_LIMIT).map((f, index) => (
