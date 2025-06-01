@@ -1,14 +1,20 @@
 /* src/styles/uploadFilesModal.module.css */
 
 .modalContent {
-    background-color: #fff;
-    padding: 2rem;
+    background-color: #6accf0;
+    padding: 20px;
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     z-index: 100;
     min-width: 350px;
     max-width: 90%;
     width: 500px;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     box-sizing: border-box;
 }
 
@@ -203,7 +209,7 @@
 }
 
 .submitButton:hover {
-    background-color: #2f855a;
+    background-color: #39c17d;
 }
 
 .cancelButton {
@@ -290,4 +296,128 @@
     .fileListItem {
         font-size: 0.8rem;
     }
+}
+
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+    padding: 20px;
+}
+
+.loaderCircle {
+    width: 80px;
+    height: 80px;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: spin 2s linear infinite;
+    margin-bottom: 20px;
+}
+
+.loaderIcon {
+    font-size: 3em;
+    color: #3498db;
+    position: absolute;
+}
+
+.loadingText {
+    font-size: 1.2em;
+    color: #555;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.successMessage {
+    color: #28a745;
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #dc3545;
+    margin-top: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.submitButton:disabled,
+.cancelButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.successContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+    padding: 20px;
+}
+
+.successImage {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+}
+
+.successMessageText {
+    font-size: 1.5em;
+    color: #28a745;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.fullScreenSuccessContainer {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+/* El overlay para el texto, que estará sobre la imagen */
+.successContentOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    min-height: auto;
+}
+
+/* Estilo para el texto de éxito dentro del overlay */
+.successMessageText {
+    font-size: 1.8em;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
