@@ -1,3 +1,4 @@
+// src/app/admin/components/UserList.tsx
 'use client'
 import { useEffect, useState } from 'react'
 
@@ -53,43 +54,48 @@ export default function UserList() {
     }, [])
 
     return (
-        <div className="p-4 border rounded shadow-md space-y-2">
-            <h2 className="text-xl font-bold">Usuarios registrados</h2>
-            <ul className="space-y-1">
-                {users.map((user) => (
-                    <li key={user._id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b py-2">
-                        {editingId === user._id ? (
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-                                <input
-                                    className="border px-2 py-1 rounded"
-                                    value={editForm.username}
-                                    onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
-                                />
-                                <select
-                                    className="border px-2 py-1 rounded"
-                                    value={editForm.rol}
-                                    onChange={(e) => setEditForm({ ...editForm, rol: e.target.value })}
-                                >
-                                    <option value="usuario">usuario</option>
-                                    <option value="admin">admin</option>
-                                </select>
-                                <div className="flex gap-2">
-                                    <button onClick={saveEdit} className="bg-green-600 text-white px-2 py-1 rounded">Guardar</button>
-                                    <button onClick={cancelEdit} className="bg-gray-500 text-white px-2 py-1 rounded">Cancelar</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex justify-between w-full items-center">
-                                <span>{user.username} ({user.rol})</span>
-                                <div className="flex gap-2">
-                                    <button onClick={() => startEdit(user)} className="text-blue-600 hover:underline">Editar</button>
-                                    <button onClick={() => deleteUser(user._id)} className="text-red-600 hover:underline">Eliminar</button>
-                                </div>
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
+        <div>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '10px' }}>
+                <ul className="space-y-1">
+                    {users.length === 0 ? (
+                        <p>No hay usuarios registrados.</p>
+                    ) : (
+                        users.map((user) => (
+                            <li key={user._id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b py-2">
+                                {editingId === user._id ? (
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
+                                        <input
+                                            className="border px-2 py-1 rounded flex-grow"
+                                            value={editForm.username}
+                                            onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
+                                        />
+                                        <select
+                                            className="border px-2 py-1 rounded"
+                                            value={editForm.rol}
+                                            onChange={(e) => setEditForm({ ...editForm, rol: e.target.value })}
+                                        >
+                                            <option value="usuario">usuario</option>
+                                            <option value="admin">admin</option>
+                                        </select>
+                                        <div className="flex gap-2 mt-2 sm:mt-0">
+                                            <button onClick={saveEdit} className="bg-green-600 text-white px-2 py-1 rounded text-sm">Guardar</button>
+                                            <button onClick={cancelEdit} className="bg-gray-500 text-white px-2 py-1 rounded text-sm">Cancelar</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex justify-between w-full items-center">
+                                        <span>{user.username} ({user.rol})</span>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => startEdit(user)} className="text-blue-600 hover:underline text-sm">Editar</button>
+                                            <button onClick={() => deleteUser(user._id)} className="text-red-600 hover:underline text-sm">Eliminar</button>
+                                        </div>
+                                    </div>
+                                )}
+                            </li>
+                        ))
+                    )}
+                </ul>
+            </div>
         </div>
     )
 }

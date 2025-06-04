@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
 import { GridFSBucket, GridFSFile } from 'mongodb';
+import FileGroupModel from '@/models/FileGroup';
 
 export async function GET(
     request: Request,
@@ -70,5 +71,58 @@ export async function GET(
             errorMessage = error.message;
         }
         return NextResponse.json({ message: 'Error interno del servidor.', error: errorMessage }, { status: 500 });
+    }
+}
+export async function DELETE(
+    request: Request,
+    { params }: { params: { fileId: string } }
+) {
+    const awaitedParams = await params;
+    const { fileId } = awaitedParams;
+
+    if (!mongoose.Types.ObjectId.isValid(fileId)) {
+        return NextResponse.json({ message: 'ID de archivo inválido.' }, { status: 400 });
+    }
+
+    try {
+        await connectDB();
+        const db = mongoose.connection.db;
+
+        if (!db) {
+            console.error('Error: La instancia de la base de datos no está disponible.');
+            return NextResponse.json({ message: 'Error interno del servidor: Base de datos no disponible.' }, { status: 500 });
+        }
+
+        const bucket = new GridFSBucket(db, {
+            bucketName: 'uploads',
+        });
+
+        const objectId = new mongoose.Types.ObjectId(fileId);
+
+        const fileToDelete = await bucket.find({ _id: objectId }).toArray();
+        if (fileToDelete.length === 0) {
+            return NextResponse.json({ message: 'Archivo no encontrado en GridFS para eliminar.' }, { status: 404 });
+        }
+
+        await bucket.delete(objectId);
+        console.log(`Archivo con ID ${fileId} eliminado de GridFS.`);
+
+        await FileGroupModel.updateMany(
+            { 'archivos.fileId': objectId },
+            { $pull: { archivos: { fileId: objectId } } }
+        );
+        console.log(`Referencia de archivo ${fileId} eliminada de FileGroup(s).`);
+
+        await FileGroupModel.deleteMany({ archivos: { $size: 0 } });
+
+        return NextResponse.json({ message: 'Archivo eliminado con éxito.' }, { status: 200 });
+
+    } catch (error: unknown) {
+        console.error('Error al eliminar el archivo:', error);
+        let errorMessage = 'Error interno del servidor al eliminar el archivo.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return NextResponse.json({ message: 'Error al eliminar el archivo.', error: errorMessage }, { status: 500 });
     }
 }

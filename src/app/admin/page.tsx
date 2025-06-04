@@ -3,11 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import UserList from './components/UserList';
-import Image from 'next/image';
-import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
-import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
-
-import styles from '@/styles/dashboard.module.css';
+import UserFileDetailsModalContent from './components/UserFileDetailsModalContent';
+import { FiSearch, FiEdit } from 'react-icons/fi';
+import styles from '@/styles/dashboardadmin.module.css';
+import ImageCollage from '@/components/ImageCollage';
 
 type FileData = {
   fileId: string;
@@ -35,40 +34,38 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const refreshAdminData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/admin/dashboard-data');
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      setUsers(Array.isArray(data.users) ? data.users : []);
+      setUsers(Array.isArray(data.users) ? data.users : []);
+    } catch (err: unknown) {
+      console.error('Error fetching admin data:', err);
+      setError('Error al cargar los datos del administrador. Por favor, inténtalo de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAdminData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/admin/dashboard-data');
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-        setUsers(Array.isArray(data.users) ? data.users : []);
-      } catch (err: unknown) {
-        console.error('Error fetching admin data:', err);
-        setError('Error al cargar los datos del administrador. Por favor, inténtalo de nuevo.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdminData();
+    refreshAdminData();
   }, []);
 
-  // --- CORRECCIÓN CLAVE AQUÍ ---
   const filteredUsers = users.filter((user) => {
-    // Si la barra de búsqueda está vacía, muestra todos los usuarios
     if (!search) {
       return true;
     }
-
-    // Comprobar si el usuario existe y si sus propiedades son strings antes de usar toLowerCase
-    const username = user?.username || ''; // Si user.username es undefined/null, usa un string vacío
-    const email = user?.email || '';     // Si user.email es undefined/null, usa un string vacío
-
+    const username = user?.username || '';
+    const email = user?.email || '';
     const lowerCaseSearch = search.toLowerCase();
 
     return (
@@ -76,47 +73,32 @@ export default function AdminDashboard() {
       email.toLowerCase().includes(lowerCaseSearch)
     );
   });
-  // --- FIN DE LA CORRECCIÓN CLAVE ---
 
-
-  const renderFileIcon = (file: FileData) => {
-    if (file.tipoArchivo.startsWith('image/')) {
-      return (
-        <Image
-          src={file.fileId ? `/api/files/${file.fileId}` : '/placeholder-image.png'}
-          alt={file.nombreArchivo}
-          width={100}
-          height={100}
-          className={styles.iconImage}
-        />
-      );
+  const getLastModifiedDate = (user: User): Date | null => {
+    if (!user.sharedFileGroups || user.sharedFileGroups.length === 0) {
+      return null;
     }
-
-    if (file.tipoArchivo === 'application/pdf') {
-      return <FaFilePdf className="text-5xl text-red-500 mx-auto" />;
+    const latestGroup = user.sharedFileGroups[0];
+    if (latestGroup && latestGroup.creadoEn) {
+      return new Date(latestGroup.creadoEn);
     }
-
-    if (
-      file.tipoArchivo === 'application/zip' ||
-      file.tipoArchivo === 'application/x-zip-compressed' ||
-      file.tipoArchivo === 'application/x-rar-compressed' ||
-      file.tipoArchivo === 'application/gzip'
-    ) {
-      return <FaFileArchive className="text-5xl text-orange-500 mx-auto" />;
-    }
-
-    if (file.tipoArchivo.startsWith('text/')) {
-      return <FiFileText className="text-5xl text-blue-500 mx-auto" />;
-    }
-    if (file.tipoArchivo.startsWith('video/')) {
-      return <div className="text-4xl mx-auto">🎬</div>;
-    }
-    if (file.tipoArchivo.startsWith('audio/')) {
-      return <div className="text-4xl mx-auto">🎵</div>;
-    }
-
-    return <FiFile className="text-5xl text-gray-500 mx-auto" />;
+    return null;
   };
+
+  const getNumberOfSharedGroups = (user: User): number => {
+    return user.sharedFileGroups?.length || 0;
+  };
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const dateA = getLastModifiedDate(a);
+    const dateB = getLastModifiedDate(b);
+
+    if (dateA === null && dateB === null) return 0;
+    if (dateA === null) return 1;
+    if (dateB === null) return -1;
+
+    return dateB.getTime() - dateA.getTime();
+  });
 
   const handleDownloadGroup = (groupId: string) => {
     if (!groupId) {
@@ -136,80 +118,253 @@ export default function AdminDashboard() {
     window.location.href = `/api/files/${fileId}`;
   };
 
+  const handleDeleteGroup = async (groupId: string, userId: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este grupo de archivos y todos sus contenidos? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/file-groups/${groupId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      setUsers(prevUsers =>
+        prevUsers.map(user => {
+          if (user._id === userId) {
+            return {
+              ...user,
+              sharedFileGroups: user.sharedFileGroups?.filter(
+                group => group._id !== groupId
+              ),
+            };
+          }
+          return user;
+        })
+      );
+      alert('Grupo de archivos eliminado con éxito.');
+
+      if (selectedUser && selectedUser._id === userId) {
+        setSelectedUser(prevSelectedUser => {
+          if (prevSelectedUser) {
+            return {
+              ...prevSelectedUser,
+              sharedFileGroups: prevSelectedUser.sharedFileGroups?.filter(
+                group => group._id !== groupId
+              ),
+            };
+          }
+          return null;
+        });
+      }
+      refreshAdminData();
+    } catch (err) {
+      console.error('Error al eliminar el grupo de archivos:', err);
+      alert('Error al eliminar el grupo de archivos. Por favor, inténtalo de nuevo.');
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string, groupId: string, userId: string) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar este archivo? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/files/${fileId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      setUsers(prevUsers =>
+        prevUsers.map(user => {
+          if (user._id === userId) {
+            return {
+              ...user,
+              sharedFileGroups: user.sharedFileGroups?.map(group => {
+                if (group._id === groupId) {
+                  return {
+                    ...group,
+                    archivos: group.archivos.filter(file => file.fileId !== fileId),
+                  };
+                }
+                return group;
+              }),
+            };
+          }
+          return user;
+        })
+      );
+      alert('Archivo eliminado con éxito.');
+      if (selectedUser && selectedUser._id === userId) {
+        setSelectedUser(prevSelectedUser => {
+          if (prevSelectedUser) {
+            return {
+              ...prevSelectedUser,
+              sharedFileGroups: prevSelectedUser.sharedFileGroups?.map(group => {
+                if (group._id === groupId) {
+                  return {
+                    ...group,
+                    archivos: group.archivos.filter(file => file.fileId !== fileId),
+                  };
+                }
+                return group;
+              }),
+            };
+          }
+          return null;
+        });
+      }
+      refreshAdminData();
+    } catch (err) {
+      console.error('Error al eliminar el archivo:', err);
+      alert('Error al eliminar el archivo. Por favor, inténtalo de nuevo.');
+    }
+  };
+
+  const openModal = (user: User) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
 
   return (
     <div className={styles.dashboardContainer}>
-      <h1 className={styles.title}>Panel de Administración</h1>
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Buscar usuarios por nombre o email..."
-          className="w-full px-4 py-2 border rounded shadow"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
-      {loading ? (
-        <p className={styles.loadingMessage}>Cargando datos de usuarios...</p>
-      ) : error ? (
-        <p className={styles.errorMessage}>{error}</p>
-      ) : filteredUsers.length === 0 ? (
-        <p className={styles.noFilesMessage}>No se encontraron usuarios que coincidan con la búsqueda.</p>
-      ) : (
-        <div className="space-y-8">
-          {filteredUsers.map((user) => (
-            <div key={user._id} className={styles.fileGroup}>
-              <div className={styles.groupHeader}>
-                <h2 className={styles.groupTitle}>Archivos compartidos con {user.username}</h2>
-              </div>
-
-              {user.sharedFileGroups && user.sharedFileGroups.length > 0 ? (
-                user.sharedFileGroups.map((group) => (
-                  <div key={group._id} className={styles.fileGroup} style={{ border: 'none', boxShadow: 'none', padding: '0', marginBottom: '1rem' }}>
-                    <div className={styles.groupHeader} style={{ marginBottom: '0.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
-                      <h3 className="text-md font-medium text-gray-700">{group.nombreGrupo}</h3>
-                      <button
-                        onClick={() => handleDownloadGroup(group._id)}
-                        className={styles.downloadGroupButton}
-                        style={{ padding: '00.35rem 0.75rem', fontSize: '0.8rem' }}
-                      >
-                        <FiDownload className="mr-1" /> Descargar Grupo
-                      </button>
-                    </div>
-                    <div className={styles.filesGrid}>
-                      {group.archivos.map((file) => (
-                        <div
-                          key={file.fileId}
-                          className={styles.fileCard}
-                        >
-                          <div className={styles.fileIconContainer}>
-                            {renderFileIcon(file)}
-                          </div>
-                          <p className={styles.fileName}>{file.nombreArchivo}</p>
-                          <button
-                            onClick={() => handleDownloadFile(file.fileId)}
-                            className={styles.downloadFileButton}
-                          >
-                            <FiDownload className="mr-1" /> Descargar
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600 mt-2">No hay grupos de archivos compartidos directamente con este usuario.</p>
-              )}
+      <main className={styles.mainContent}>
+        <header className={styles.header}>
+          <div className={styles.searchBar}>
+            <FiSearch className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className={styles.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </header>
+        <section className={styles.userFilesSection}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Archivos Compartidos</h2>
+            <div className={styles.sectionStats}>
+              <span className={styles.statItem}>{users.length} Usuarios con archivos</span>
             </div>
-          ))}
+          </div>
+
+          {loading ? (
+            <p className={styles.loadingMessage}>Cargando datos de usuarios...</p>
+          ) : error ? (
+            <p className={styles.errorMessage}>{error}</p>
+          ) : sortedUsers.length === 0 ? (
+            <p className={styles.noFilesMessage}>No se encontraron usuarios que coincidan con la búsqueda o con archivos compartidos.</p>
+          ) : (
+            <div className={styles.userTableContainer}>
+              <table className={styles.userTable}>
+                <thead>
+                  <tr>
+                    <th>Nombre de Usuario</th>
+                    <th>Grupos Compartidos</th>
+                    <th>Última Modificación</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedUsers.map((user) => {
+                    const latestDate = getLastModifiedDate(user);
+                    const numGroups = getNumberOfSharedGroups(user);
+
+                    const dateDisplay = latestDate
+                      ? new Date(latestDate).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                      : 'N/A';
+                    const timeDisplay = latestDate
+                      ? new Date(latestDate).toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                      : '';
+                    return (
+                      <tr key={user._id}>
+                        <td>
+                          <div className={styles.userTableCell}>
+                            {user.username}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={styles.groupCountCell}>{numGroups}</span>
+                        </td>
+                        <td>
+                          {latestDate ? (
+                            <>
+                              <span className={styles.dateCell}>{dateDisplay}</span>
+                              <span className={styles.timeCell}>{timeDisplay}</span>
+                            </>
+                          ) : (
+                            'Sin archivos'
+                          )}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => openModal(user)}
+                            className={styles.editButton}
+                          >
+                            <FiEdit className="mr-1" /> Visualizar
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className={styles.metricsGrid}>
+          <div className={styles.metricCard}>
+            <h2 className={styles.metricTitle}>Gestión de Usuarios</h2>
+            <div className={styles.metricContent}>
+              <UserList />
+            </div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <h2 className={styles.metricTitle}>Collage</h2>
+            <div className={styles.metricContent}>
+              <ImageCollage />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {isModalOpen && selectedUser && (
+        <div className={styles.modalOverlay} onClick={closeModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalCloseButton} onClick={closeModal}>
+              &times;
+            </button>
+            <UserFileDetailsModalContent
+              user={selectedUser}
+              handleDownloadGroup={handleDownloadGroup}
+              handleDownloadFile={handleDownloadFile}
+              handleDeleteGroup={handleDeleteGroup}
+              handleDeleteFile={handleDeleteFile}
+            />
+          </div>
         </div>
       )}
-
-      <div className="mt-8">
-        <h2 className={styles.title} style={{ fontSize: '1.8rem', marginBottom: '1.5rem' }}>Gestión de Usuarios</h2>
-        <UserList />
-      </div>
     </div>
   );
 }
