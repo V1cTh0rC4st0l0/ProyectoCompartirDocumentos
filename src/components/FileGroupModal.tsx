@@ -74,14 +74,14 @@ export default function FileGroupModal({ group, onClose }: FileGroupModalProps) 
         window.location.href = `/api/files/${fileId}`;
     };
 
-    const handleDownloadGroup = (groupId: string) => {
+    {/*const handleDownloadGroup = (groupId: string) => {
         if (!groupId) {
             console.error('No se proporcionó un ID de grupo para descargar.');
             alert('Error: ID de grupo no disponible.');
             return;
         }
         window.location.href = `/api/file-groups/download/${groupId}`;
-    };
+    };*/}
 
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
@@ -91,12 +91,12 @@ export default function FileGroupModal({ group, onClose }: FileGroupModalProps) 
                 </button>
                 <h2 className={styles.modalTitle}>{group.nombreGrupo}</h2>
                 <div className={styles.modalHeaderActions}>
-                    <button
+                    {/*<button
                         onClick={() => handleDownloadGroup(group._id)}
                         className={styles.downloadGroupButton}
                     >
                         <FiDownload className="mr-2" /> Descargar Grupo Completo
-                    </button>
+                    </button>*/}
                 </div>
 
                 <div className={styles.filesGrid}>

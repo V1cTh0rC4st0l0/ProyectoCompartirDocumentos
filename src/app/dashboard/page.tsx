@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 import styles from '@/styles/dashboard.module.css';
-import FileGroupModal from '@/components/FileGroupModal'; // Importar el nuevo modal
+import FileGroupModal from '@/components/FileGroupModal';
 
 type FileData = {
     fileId: string;
@@ -28,9 +28,9 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<FileGroup | null>(null);
+    const [userName, setUserName] = useState<string>(''); // <-- Nuevo estado para el nombre del usuario
 
-    // Límite de archivos a mostrar por grupo en la vista inicial
-    const GROUP_FILE_DISPLAY_LIMIT = 2; // Mostrar solo 2 archivos por grupo inicialmente
+    const GROUP_FILE_DISPLAY_LIMIT = 2;
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -39,18 +39,29 @@ export default function DashboardPage() {
                     withCredentials: true,
                 });
 
-                if (Array.isArray(res.data)) {
-                    setFileGroups(res.data);
+                // --- INICIO DE CAMBIO ---
+                // La API ahora devuelve un objeto con 'userName' y 'fileGroups'
+                const { userName, fileGroups } = res.data;
+
+                setUserName(userName || ''); // Guardar el nombre del usuario
+                if (Array.isArray(fileGroups)) {
+                    setFileGroups(fileGroups);
                 } else {
-                    console.warn('API returned unexpected data for file groups (not an array):', res.data);
+                    console.warn('API returned unexpected data for file groups (not an array):', fileGroups);
                     setFileGroups([]);
                 }
+                // --- FIN DE CAMBIO ---
+
             } catch (err: unknown) {
                 console.error('Error al cargar grupos de archivos', err);
                 let errorMessage = 'No se pudieron cargar los archivos compartidos. Por favor, inténtalo de nuevo más tarde.';
 
                 if (axios.isAxiosError(err)) {
-                    if (err.response?.data?.message) {
+                    if (err.response?.status === 401) { // Manejar específicamente errores de autenticación
+                        errorMessage = 'Su sesión ha expirado o no está autenticado. Por favor, inicie sesión de nuevo.';
+                        // Opcional: Redirigir al usuario a la página de login
+                        // window.location.href = '/login';
+                    } else if (err.response?.data?.message) {
                         errorMessage = err.response.data.message;
                     } else if (err.message) {
                         errorMessage = `Error: ${err.message}`;
@@ -61,6 +72,7 @@ export default function DashboardPage() {
 
                 setError(errorMessage);
                 setFileGroups([]);
+                setUserName(''); // Limpiar el nombre en caso de error
             } finally {
                 setLoading(false);
             }
@@ -69,7 +81,7 @@ export default function DashboardPage() {
         fetchGroups();
     }, []);
 
-    const handleDownloadGroup = async (groupId: string) => {
+    {/*const handleDownloadGroup = async (groupId: string) => {
         if (!groupId) {
             console.error('No se proporcionó un ID de grupo para descargar.');
             alert('Error: ID de grupo no disponible.');
@@ -81,7 +93,7 @@ export default function DashboardPage() {
             console.error('Error al iniciar la descarga del grupo:', error);
             alert('Hubo un error al intentar descargar el grupo de archivos.');
         }
-    };
+    };*/}
 
     const handleDownloadFile = (fileId: string) => {
         if (!fileId) {
@@ -143,7 +155,12 @@ export default function DashboardPage() {
 
     return (
         <div className={styles.dashboardContainer}>
-            <h1 className={styles.title}>Archivos compartidos con Usted</h1>
+            <header className={styles.header}>
+                {/* Usa el estado `userName` aquí */}
+                <h1 className={styles.headerTitle}>
+                    ¡Hola Doctor {userName || '...'}{/* Muestra '...' mientras carga o si no hay nombre */}!
+                </h1>
+            </header>
 
             {loading ? (
                 <p className={styles.loadingMessage}>Cargando archivos...</p>
@@ -156,12 +173,12 @@ export default function DashboardPage() {
                     <div key={group._id} className={styles.fileGroup}>
                         <div className={styles.groupHeader}>
                             <h2 className={styles.groupTitle}>{group.nombreGrupo}</h2>
-                            <button
+                            {/*<button
                                 onClick={() => handleDownloadGroup(group._id)}
                                 className={styles.downloadGroupButton}
                             >
                                 <FiDownload className="mr-2" /> Descargar Grupo
-                            </button>
+                            </button>*/}
                         </div>
                         <div className={styles.filesGrid}>
                             {group.archivos.slice(0, GROUP_FILE_DISPLAY_LIMIT).map((file) => (

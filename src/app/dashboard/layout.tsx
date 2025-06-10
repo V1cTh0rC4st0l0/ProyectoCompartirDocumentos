@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             {/* Sidebar */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
-                <h2 className={styles.sidebarTitle}>Usuario</h2>
+                <h2 className={styles.sidebarTitle}>RAXVEL</h2>
                 <ul className={styles.sidebarNav}>
                     <li>
                         <Link href="/login" className={styles.sidebarLink} onClick={() => setIsSidebarOpen(false)}>
