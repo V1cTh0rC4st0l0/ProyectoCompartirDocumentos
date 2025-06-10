@@ -7,6 +7,7 @@ import UserFileDetailsModalContent from './components/UserFileDetailsModalConten
 import { FiSearch, FiEdit } from 'react-icons/fi';
 import styles from '@/styles/dashboardadmin.module.css';
 import ImageCollage from '@/components/ImageCollage';
+import ActivityLogCard from './components/ActivityLogCard';
 
 type FileData = {
   fileId: string;
@@ -26,7 +27,11 @@ type User = {
   _id: string;
   username: string;
   email: string;
+  createdFileGroups?: FileGroup[];
   sharedFileGroups?: FileGroup[];
+  totalFilesSharedByThisUser?: number;
+  totalFilesSharedWithThisUser?: number;
+  lastActivityDate?: string | null; // Nuevo campo para la fecha de última actividad
 };
 
 export default function AdminDashboard() {
@@ -75,12 +80,8 @@ export default function AdminDashboard() {
   });
 
   const getLastModifiedDate = (user: User): Date | null => {
-    if (!user.sharedFileGroups || user.sharedFileGroups.length === 0) {
-      return null;
-    }
-    const latestGroup = user.sharedFileGroups[0];
-    if (latestGroup && latestGroup.creadoEn) {
-      return new Date(latestGroup.creadoEn);
+    if (user.lastActivityDate) {
+      return new Date(user.lastActivityDate);
     }
     return null;
   };
@@ -90,14 +91,9 @@ export default function AdminDashboard() {
   };
 
   const sortedUsers = [...filteredUsers].sort((a, b) => {
-    const dateA = getLastModifiedDate(a);
-    const dateB = getLastModifiedDate(b);
-
-    if (dateA === null && dateB === null) return 0;
-    if (dateA === null) return 1;
-    if (dateB === null) return -1;
-
-    return dateB.getTime() - dateA.getTime();
+    const dateA = a.lastActivityDate ? new Date(a.lastActivityDate).getTime() : 0;
+    const dateB = b.lastActivityDate ? new Date(b.lastActivityDate).getTime() : 0;
+    return dateB - dateA; // De más reciente a menos reciente
   });
 
   const handleDownloadGroup = (groupId: string) => {
@@ -256,7 +252,7 @@ export default function AdminDashboard() {
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>Archivos Compartidos</h2>
             <div className={styles.sectionStats}>
-              <span className={styles.statItem}>{users.length} Usuarios con archivos</span>
+              <span className={styles.statItem}>{users.length} Usuarios</span>
             </div>
           </div>
 
@@ -280,7 +276,6 @@ export default function AdminDashboard() {
                 <tbody>
                   {sortedUsers.map((user) => {
                     const latestDate = getLastModifiedDate(user);
-                    const numGroups = getNumberOfSharedGroups(user);
 
                     const dateDisplay = latestDate
                       ? new Date(latestDate).toLocaleDateString('es-ES', {
@@ -302,8 +297,8 @@ export default function AdminDashboard() {
                             {user.username}
                           </div>
                         </td>
-                        <td>
-                          <span className={styles.groupCountCell}>{numGroups}</span>
+                        <td className={styles.groupCountCell}>
+                          {getNumberOfSharedGroups(user)}
                         </td>
                         <td>
                           {latestDate ? (
@@ -345,6 +340,10 @@ export default function AdminDashboard() {
             <div className={styles.metricContent}>
               <ImageCollage />
             </div>
+          </div>
+
+          <div className={styles.metricCard}>
+            <ActivityLogCard />
           </div>
         </section>
       </main>

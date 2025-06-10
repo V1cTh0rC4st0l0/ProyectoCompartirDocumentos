@@ -1,15 +1,18 @@
 // /app/api/files/[fileId]/route.ts
+'use server';
+
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import mongoose from 'mongoose';
 import { GridFSBucket, GridFSFile } from 'mongodb';
-import FileGroupModel from '@/models/FileGroup';
+import FileGroupModel, { IFileGroupBase } from '@/models/FileGroup';
+import ActivityLog from '@/models/ActivityLog';
+import { getAuthenticatedUserFromToken } from '@/lib/auth';
 
 export async function GET(
     request: Request,
     { params }: { params: { fileId: string } }
 ) {
-
     const awaitedParams = await params;
     const { fileId } = awaitedParams;
 
@@ -73,10 +76,20 @@ export async function GET(
         return NextResponse.json({ message: 'Error interno del servidor.', error: errorMessage }, { status: 500 });
     }
 }
+
 export async function DELETE(
     request: Request,
     { params }: { params: { fileId: string } }
 ) {
+    const authenticatedUser = await getAuthenticatedUserFromToken();
+    const userId = authenticatedUser?.userId;
+    const username = authenticatedUser?.username;
+    const userRole = authenticatedUser?.rol;
+
+    if (!userId || !username || userRole !== 'admin') {
+        return NextResponse.json({ ok: false, message: 'No autorizado. Se requiere rol de administrador.' }, { status: 403 });
+    }
+
     const awaitedParams = await params;
     const { fileId } = awaitedParams;
 
@@ -90,7 +103,7 @@ export async function DELETE(
 
         if (!db) {
             console.error('Error: La instancia de la base de datos no está disponible.');
-            return NextResponse.json({ message: 'Error interno del servidor: Base de datos no disponible.' }, { status: 500 });
+            return NextResponse.json({ message: 'Error interno del servidor: Base de database no disponible.' }, { status: 500 });
         }
 
         const bucket = new GridFSBucket(db, {
@@ -99,10 +112,15 @@ export async function DELETE(
 
         const objectId = new mongoose.Types.ObjectId(fileId);
 
-        const fileToDelete = await bucket.find({ _id: objectId }).toArray();
-        if (fileToDelete.length === 0) {
+        const fileToDeleteDetails = await bucket.find({ _id: objectId }).toArray();
+        if (fileToDeleteDetails.length === 0) {
             return NextResponse.json({ message: 'Archivo no encontrado en GridFS para eliminar.' }, { status: 404 });
         }
+        const originalFileName = fileToDeleteDetails[0].filename;
+
+        const fileGroup: IFileGroupBase | null = await FileGroupModel.findOne({
+            'archivos.fileId': objectId
+        }).lean<IFileGroupBase>();
 
         await bucket.delete(objectId);
         console.log(`Archivo con ID ${fileId} eliminado de GridFS.`);
@@ -114,6 +132,20 @@ export async function DELETE(
         console.log(`Referencia de archivo ${fileId} eliminada de FileGroup(s).`);
 
         await FileGroupModel.deleteMany({ archivos: { $size: 0 } });
+        console.log('Grupos vacíos eliminados.');
+
+        await ActivityLog.create({
+            userId: new mongoose.Types.ObjectId(userId),
+            username: username,
+            action: 'delete_file',
+            targetType: 'file',
+            targetId: objectId,
+            details: {
+                fileName: originalFileName,
+                groupName: fileGroup ? fileGroup.nombreGrupo : 'N/A',
+            },
+            timestamp: new Date(),
+        });
 
         return NextResponse.json({ message: 'Archivo eliminado con éxito.' }, { status: 200 });
 

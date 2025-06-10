@@ -5,16 +5,23 @@ import styles from '@/styles/login.module.css'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Image from 'next/image';
 import ImageCollage from '@/components/ImageCollage';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const handleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
         const res = await fetch('/api/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ email, password }),
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
         })
@@ -22,14 +29,17 @@ export default function LoginPage() {
         if (res.ok) {
             const data = await res.json()
             if (data.rol === 'admin') {
-                window.location.href = '/admin'
+                router.push('/admin');
             } else {
-                window.location.href = '/dashboard'
+                router.push('/dashboard');
             }
         } else {
-            alert('Credenciales inválidas')
+            const errorData = await res.json();
+            setError(errorData.message || 'Credenciales inválidas');
         }
+        setIsLoading(false);
     }
+
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
@@ -52,13 +62,13 @@ export default function LoginPage() {
                         <p className={styles.secondaryText}>Inicia sesión para continuar.</p>
                     </div>
                     <div className={styles.inputGroup}>
-                        <label htmlFor="username" className={styles.label}>Usuario</label>
+                        <label htmlFor="email" className={styles.label}>Correo Electrónico</label>
                         <input
-                            type="text"
-                            id="username"
-                            placeholder="Ingresa tu usuario"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            type="email"
+                            id="email"
+                            placeholder="Ingresa tu correo electrónico"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className={styles.input}
                         />
                     </div>
@@ -78,8 +88,9 @@ export default function LoginPage() {
                             </span>
                         </div>
                     </div>
-                    <button onClick={handleLogin} className={styles.loginButton}>
-                        Login
+                    {error && <p className={styles.errorMessage}>{error}</p>}
+                    <button onClick={handleLogin} className={styles.loginButton} disabled={isLoading}>
+                        {isLoading ? 'Iniciando sesión...' : 'Login'}
                     </button>
                 </div>
             </div>
@@ -88,4 +99,4 @@ export default function LoginPage() {
             </div>
         </div>
     )
-}
+};

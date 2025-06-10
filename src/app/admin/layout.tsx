@@ -1,10 +1,9 @@
-// src/app/admin/layout.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/adminLayout.module.css';
-import PanelDeOpciones from '@/components/PanelDeOpciones';
+// import PanelDeOpciones from '@/components/PanelDeOpciones'; // ¡Eliminado!
 import ImageCollage from '@/components/ImageCollage';
 import CreateUserModal from '@/components/CreateUserModal';
 import UploadFilesModal from '@/components/UploadFilesModal';
@@ -13,7 +12,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isPanelOpen, setIsPanelOpen] = useState(false);
+    // const [isPanelOpen, setIsPanelOpen] = useState(false); // ¡Eliminado!
     const [isCollageModalOpen, setIsCollageModalOpen] = useState(false);
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
     const [isUploadFilesModalOpen, setIsUploadFilesModalOpen] = useState(false);
@@ -34,14 +33,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    const openPanel = () => {
-        setIsPanelOpen(true);
-        setIsSidebarOpen(false);
-    };
+    // const openPanel = () => { // ¡Eliminado!
+    //     setIsPanelOpen(true);
+    //     setIsSidebarOpen(false);
+    // };
 
-    const closePanel = () => {
-        setIsPanelOpen(false);
-    };
+    // const closePanel = () => { // ¡Eliminado!
+    //     setIsPanelOpen(false);
+    // };
 
     const openCollageModal = () => {
         setIsCollageModalOpen(true);
@@ -93,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             {/* Sidebar */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
-                <h1 className={styles.sidebarTitle}>Panel Admin</h1>
+                <h1 className={styles.sidebarTitle}>Raxvel</h1>
                 <nav className={styles.sidebarNav}>
                     <Link href="/login" className={styles.sidebarLink} onClick={() => setIsSidebarOpen(false)}>
                         Salir
@@ -107,9 +106,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <button onClick={openCollageModal} className={styles.sidebarLink}>
                         Editar Collage
                     </button>
-                    <button onClick={openPanel} className={styles.sidebarLink}>
+                    {/* <button onClick={openPanel} className={styles.sidebarLink}> // ¡Eliminado!
                         Opciones Extra
-                    </button>
+                    </button> */}
                     <button onClick={openUploadViewerModal} className={styles.sidebarLink}>
                         Subir Visor 3D
                     </button>
@@ -120,11 +119,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <main className={styles.mainContent}>{children}</main>
 
             {/* Modales (mantienen la lógica existente) */}
-            {isPanelOpen && (
+            {/* {isPanelOpen && ( // ¡Eliminado!
                 <div className={styles.modalOverlay} onClick={closePanel}>
                     <PanelDeOpciones onClose={closePanel} />
                 </div>
-            )}
+            )} */}
             {isCollageModalOpen && (
                 <div className={styles.modalOverlay} onClick={closeCollageModal}>
                     <ImageCollage isOpen={isCollageModalOpen} onClose={closeCollageModal} />

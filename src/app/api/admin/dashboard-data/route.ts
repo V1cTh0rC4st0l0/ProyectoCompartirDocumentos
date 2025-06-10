@@ -1,38 +1,95 @@
-// app/api/admin/dashboard-data/route.ts
-import { NextResponse } from 'next/server';
+// src/app/api/admin/dashboard-data/route.ts
+'use server';
+
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
 import FileGroupModel from '@/models/FileGroup';
+import { NextResponse } from 'next/server';
+import { getAuthenticatedUserFromToken } from '@/lib/auth';
 
 export async function GET() {
     try {
         await connectDB();
 
-        // Obtener todos los usuarios
-        const users = await User.find().select('username _id email');
+        const authenticatedUser = await getAuthenticatedUserFromToken();
+        if (!authenticatedUser || authenticatedUser.rol !== 'admin') {
+            return NextResponse.json({ ok: false, message: 'No autorizado. Se requiere rol de administrador.' }, { status: 403 });
+        }
 
-        // Mapear usuarios con sus grupos compartidos
-        const usersWithSharedGroups = await Promise.all(
+        const users = await User.find({}).lean();
+
+        const usersWithFileData = await Promise.all(
             users.map(async (user) => {
-                const sharedGroups = await FileGroupModel.find({ usuario: user._id })
+                const createdFileGroups = await FileGroupModel.find({ usuario: user._id })
                     .populate('archivos')
-                    .sort({ fechaCreacion: -1 }); // Ordenar por fechaCreacion descendente para facilitar encontrar la última fecha
+                    .sort({ fechaCreacion: -1 })
+                    .lean();
 
-                // Asegúrate de que 'creadoEn' en el frontend coincide con 'fechaCreacion' del modelo
-                const formattedGroups = sharedGroups.map(group => ({
-                    ...group.toObject(),
-                    creadoEn: group.fechaCreacion ? group.fechaCreacion.toISOString() : undefined // Convertir a ISO string
-                }));
+                const sharedFileGroups = await FileGroupModel.find({ compartidoCon: user._id })
+                    .populate('archivos')
+                    .sort({ fechaCreacion: -1 })
+                    .lean();
 
-                return { ...user.toObject(), sharedFileGroups: formattedGroups };
+                let totalFilesSharedByThisUser = 0;
+                createdFileGroups.forEach(group => {
+                    if (group.compartidoCon && group.compartidoCon.length > 0) {
+                        totalFilesSharedByThisUser += group.archivos.length;
+                    }
+                });
+
+                let totalFilesSharedWithThisUser = 0;
+                sharedFileGroups.forEach(group => {
+                    totalFilesSharedWithThisUser += group.archivos.length;
+                });
+
+                // --- NUEVA LÓGICA PARA LA ÚLTIMA ACTIVIDAD ---
+                let lastActivityDate: Date | null = null;
+
+                // Considerar la fecha de creación de los grupos que el usuario posee
+                createdFileGroups.forEach(group => {
+                    if (group.fechaCreacion && (!lastActivityDate || group.fechaCreacion > lastActivityDate)) {
+                        lastActivityDate = group.fechaCreacion;
+                    }
+                });
+
+                // Considerar la fecha de creación de los grupos que han sido compartidos con el usuario
+                sharedFileGroups.forEach(group => {
+                    if (group.fechaCreacion && (!lastActivityDate || group.fechaCreacion > lastActivityDate)) {
+                        lastActivityDate = group.fechaCreacion;
+                    }
+                });
+                // --- FIN NUEVA LÓGICA ---
+
+                return {
+                    ...user,
+                    createdFileGroups: createdFileGroups,
+                    sharedFileGroups: sharedFileGroups,
+                    totalFilesSharedByThisUser: totalFilesSharedByThisUser,
+                    totalFilesSharedWithThisUser: totalFilesSharedWithThisUser,
+                    lastActivityDate: lastActivityDate ? (lastActivityDate as Date).toISOString() : null,
+                };
             })
         );
 
-        // La API solo devuelve la lista de usuarios con sus grupos
-        return NextResponse.json({ users: usersWithSharedGroups });
+        // Ordenar los usuarios aquí en el backend antes de enviarlos al frontend
+        // para que el frontend reciba los datos ya ordenados por última actividad.
+        usersWithFileData.sort((a, b) => {
+            const dateA = a.lastActivityDate ? new Date(a.lastActivityDate).getTime() : 0;
+            const dateB = b.lastActivityDate ? new Date(b.lastActivityDate).getTime() : 0;
 
-    } catch (error) {
-        console.error('Error fetching admin dashboard data:', error);
-        return NextResponse.json({ error: 'Failed to fetch admin data' }, { status: 500 });
+            // Ordenar de más reciente (mayor timestamp) a menos reciente
+            return dateB - dateA;
+        });
+
+
+        return NextResponse.json({ ok: true, users: usersWithFileData }, { status: 200 });
+
+    } catch (error: unknown) {
+        console.error('Error al obtener datos del dashboard de administrador:', error);
+        let errorMessage = 'Error interno del servidor.';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return NextResponse.json({ ok: false, message: errorMessage }, { status: 500 });
     }
-};
+}

@@ -1,15 +1,34 @@
-// src/app/api/upload/route.ts
+// src/app/api/file-groups/upload/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import { Readable } from 'stream';
 import FileGroupModel, { IArchivo } from '@/models/FileGroup';
+import ActivityLog from '@/models/ActivityLog';
+import User from '@/models/User';
 import mongoose from 'mongoose';
+import { getAuthenticatedUserFromToken } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
+
+type LogDetailType = {
+    fileName: string;
+    groupName: string;
+    sharedWithUsernames?: string;
+    addedToExistingGroup?: boolean;
+};
 
 export async function POST(req: NextRequest) {
     try {
         await connectDB();
+
+        const authenticatedUser = await getAuthenticatedUserFromToken();
+        const uploaderId = authenticatedUser?.userId;
+        const uploaderUsername = authenticatedUser?.username;
+
+        if (!uploaderId || !uploaderUsername) {
+            return NextResponse.json({ ok: false, message: 'No autorizado. Se requiere autenticación.' }, { status: 401 });
+        }
 
         const db = mongoose.connection.db;
         if (!db) {
@@ -18,21 +37,23 @@ export async function POST(req: NextRequest) {
         }
 
         const formData = await req.formData();
-
         const nombreGrupo = formData.get('nombreGrupo') as string;
-        const usuarioId = formData.get('usuarioId') as string;
-
         const compartidoConRaw = formData.getAll('compartidoCon');
         const compartidoCon = compartidoConRaw
-            .filter(id => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id))
-            .map(id => new mongoose.Types.ObjectId(id.toString()));
+            .filter((id: FormDataEntryValue): id is string => typeof id === 'string' && mongoose.Types.ObjectId.isValid(id))
+            .map(id => new mongoose.Types.ObjectId(id));
 
-        if (!nombreGrupo || !usuarioId) {
-            return NextResponse.json({ ok: false, message: 'Faltan datos requeridos (nombreGrupo o usuarioId)' }, { status: 400 });
+        if (!nombreGrupo) {
+            return NextResponse.json({ ok: false, message: 'Falta el nombre del grupo' }, { status: 400 });
+        }
+
+        let sharedWithUsernames: string[] = [];
+        if (compartidoCon.length > 0) {
+            const sharedUsers = await User.find({ _id: { $in: compartidoCon } }).select('username');
+            sharedWithUsernames = sharedUsers.map(u => u.username);
         }
 
         const archivos = formData.getAll('archivos') as File[];
-
         if (!archivos.length) {
             return NextResponse.json({ ok: false, message: 'No se subieron archivos' }, { status: 400 });
         }
@@ -42,17 +63,17 @@ export async function POST(req: NextRequest) {
         });
 
         const archivosGuardados: IArchivo[] = [];
+        const uploadedFileNames: string[] = [];
 
         for (const archivo of archivos) {
             const bytes = await archivo.arrayBuffer();
             const buffer = Buffer.from(bytes);
             const stream = Readable.from(buffer);
-
             await new Promise<void>((resolve, reject) => {
                 const uploadStream = bucket.openUploadStream(archivo.name, {
                     contentType: archivo.type,
                     metadata: {
-                        usuarioId,
+                        usuarioId: uploaderId,
                         nombreGrupo,
                     },
                 });
@@ -63,7 +84,7 @@ export async function POST(req: NextRequest) {
                         reject(err);
                     })
                     .on('finish', () => {
-                        const fileIdStr = uploadStream.id?.toString?.(); // por seguridad
+                        const fileIdStr = uploadStream.id?.toString?.();
                         if (!fileIdStr) {
                             return reject(new Error('ID de archivo no disponible'));
                         }
@@ -74,35 +95,61 @@ export async function POST(req: NextRequest) {
                             tipoArchivo: archivo.type,
                             ruta: `/api/files/${fileIdStr}`,
                         });
+                        uploadedFileNames.push(archivo.name);
                         resolve();
                     });
             });
         }
 
-        // 🔍 Verificar si ya existe un grupo con el mismo nombre, usuario y destinatarios
+        let newFileGroup: typeof FileGroupModel | null = null;
+        let logTargetId: mongoose.Types.ObjectId | undefined;
+        const logDetails: LogDetailType = {
+            fileName: uploadedFileNames.join(', '),
+            groupName: nombreGrupo,
+        };
+
         const grupoExistente = await FileGroupModel.findOne({
             nombreGrupo: nombreGrupo,
-            usuario: new mongoose.Types.ObjectId(usuarioId),
+            usuario: new mongoose.Types.ObjectId(uploaderId),
             compartidoCon: { $all: compartidoCon, $size: compartidoCon.length }
         });
 
         if (grupoExistente) {
             grupoExistente.archivos.push(...archivosGuardados);
             await grupoExistente.save();
+            newFileGroup = grupoExistente;
+            logTargetId = grupoExistente._id;
+            logDetails.addedToExistingGroup = true;
+        } else {
+            const grupo = await FileGroupModel.create({
+                nombreGrupo: nombreGrupo,
+                usuario: new mongoose.Types.ObjectId(uploaderId),
+                archivos: archivosGuardados,
+                compartidoCon,
+                fechaCreacion: new Date(),
+            });
 
-            return NextResponse.json({ ok: true, message: 'Archivos añadidos al grupo existente', grupo: grupoExistente });
+            newFileGroup = grupo;
+            logTargetId = grupo._id;
+
+            if (compartidoCon.length > 0) {
+                logDetails.sharedWithUsernames = sharedWithUsernames.join(', ');
+            }
         }
 
-        // 🆕 Si no existe, crear un nuevo grupo
-        const grupo = await FileGroupModel.create({
-            nombreGrupo: nombreGrupo,
-            usuario: new mongoose.Types.ObjectId(usuarioId),
-            archivos: archivosGuardados,
-            compartidoCon,
-            fechaCreacion: new Date(),
-        });
+        if (newFileGroup) {
+            await ActivityLog.create({
+                userId: new mongoose.Types.ObjectId(uploaderId),
+                username: uploaderUsername,
+                action: 'upload',
+                targetType: 'fileGroup',
+                targetId: logTargetId,
+                details: logDetails,
+                timestamp: new Date(),
+            });
+        }
 
-        return NextResponse.json({ ok: true, message: 'Archivos subidos y nuevo grupo creado', grupo });
+        return NextResponse.json({ ok: true, message: 'Archivos subidos y grupo gestionado', grupo: newFileGroup });
 
     } catch (error: unknown) {
         console.error('Error en la ruta de subida de archivos:', error);

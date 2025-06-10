@@ -8,41 +8,43 @@ interface CreateUserModalProps {
 }
 
 export default function CreateUserModal({ onClose }: CreateUserModalProps) {
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
-    const [rol, setRol] = useState('usuario')
-    const [message, setMessage] = useState('')
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [rol, setRol] = useState('usuario');
+    const [message, setMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setMessage('')
+        e.preventDefault();
+        setMessage('');
         setIsSuccess(null);
 
         try {
             const res = await fetch('/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, rol }),
-            })
-            const data = await res.json()
+                body: JSON.stringify({ username, email, password, rol }),
+            });
+            const data = await res.json();
 
             if (res.ok) {
-                setMessage(data.message || 'Usuario creado exitosamente.')
+                setMessage(data.message || 'Usuario creado exitosamente.');
                 setIsSuccess(true);
-                setUsername('')
-                setPassword('')
-                setRol('usuario')
+                setUsername('');
+                setEmail('');
+                setPassword('');
+                setRol('usuario');
             } else {
-                setMessage(data.message || 'Error al crear usuario.')
+                setMessage(data.message || 'Error al crear usuario.');
                 setIsSuccess(false);
             }
         } catch (error) {
             console.error("Error en la solicitud:", error);
-            setMessage('Error de conexión o servidor.')
+            setMessage('Error de conexión o servidor.');
             setIsSuccess(false);
         }
-    }
+    };
 
     return (
         <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -60,6 +62,20 @@ export default function CreateUserModal({ onClose }: CreateUserModalProps) {
                         required
                     />
                 </div>
+
+                <div className={styles.inputGroup}>
+                    <label htmlFor="email" className={styles.label}>Correo Electrónico</label>
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Ingresa el correo electrónico"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={styles.input}
+                        required
+                    />
+                </div>
+
                 <div className={styles.inputGroup}>
                     <label htmlFor="password" className={styles.label}>Contraseña</label>
                     <input

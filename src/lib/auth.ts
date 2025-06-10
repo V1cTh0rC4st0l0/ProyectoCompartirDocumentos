@@ -1,24 +1,45 @@
 // src/lib/auth.ts
 import { cookies } from 'next/headers';
-import { verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User from '@/models/User';
+import { connectDB } from '@/lib/mongodb';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secreto';
+const JWT_SECRET = process.env.JWT_SECRET || 'clave_secreta_temporal';
 
-export async function getUserFromCookies() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
+interface JwtPayload {
+    id: string;
+    rol: string;
+    iat: number;
+    exp: number;
+}
 
-    if (!token) return null;
-
+export async function getAuthenticatedUserFromToken() {
     try {
-        const decoded = verify(token, JWT_SECRET) as { userId: string };
-        const user = await User.findById(decoded.userId).lean();
+        const token = (await cookies()).get('token')?.value;
 
-        return user;
-    } catch (error: unknown) {
-        console.error('Error al verificar el token o encontrar el usuario:', error);
+        if (!token) {
+            return null;
+        }
 
+        const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+        if (!decoded || !decoded.id) {
+            return null;
+        }
+
+        await connectDB();
+        const user = await User.findById(decoded.id).select('username rol');
+
+        if (!user) {
+            return null;
+        }
+
+        return {
+            userId: user._id.toString(),
+            username: user.username,
+            rol: user.rol,
+        };
+    } catch {
         return null;
     }
 }

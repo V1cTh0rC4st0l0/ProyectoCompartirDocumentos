@@ -115,7 +115,6 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
             formData.append('archivos', file);
         }
         formData.append('nombreGrupo', nombreGrupo);
-        formData.append('usuarioId', compartidoConId);
         formData.append('compartidoCon', compartidoConId);
 
         try {
@@ -226,6 +225,7 @@ export default function UploadFilesModal({ onClose }: UploadFilesModalProps) {
                                 setCompartidoConId('');
                                 setCompartidoConUsername('');
                                 setSearch('');
+                                setGruposExistentes([]);
                             }}>
                                 <AiOutlineClose />
                             </button>
