@@ -1,88 +1,44 @@
 /* src/styles/login.module.css */
 
 .loginPageContainer {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f0f2f5;
-}
-
-.loginFormSection {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    /* Ocupa la mitad del espacio disponible */
-    padding: 20px;
-    /* Añade un poco de espacio alrededor del formulario */
-    background-image: url('/images/background.jpg');
-    /* Ruta relativa a la carpeta 'public' */
-    background-size: cover;
-    /* Escala la imagen para cubrir todo el contenedor */
-    background-position: center;
-    /* Centra la imagen */
-    background-repeat: no-repeat;
-    /* Evita que la imagen se repita */
-    min-height: 100vh;
-    /* Asegura que el contenedor ocupe al menos toda la altura de la ventana */
-    width: 100%;
-    /* Asegura que ocupe todo el ancho */
     position: relative;
-    /* Importante para el z-index si usas overlays */
-    /* Asegúrate de que el contenido sea legible sobre el fondo */
-    color: #333;
-    /* Color de texto predeterminado para legibilidad */
-    /* Puedes añadir un pseudo-elemento para un overlay */
-    /* overflow: auto;  Si el contenido es más largo que la ventana */
-}
-
-.loginCard {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    /* Ancho fijo para el formulario */
-    max-width: 100%;
-    /* Asegura que no se desborde en pantallas pequeñas */
-}
-
-.imageCollageSection {
-    flex: 1;
-    /* Ocupa la mitad del espacio disponible */
-    background-color: #e0f7fa;
-    /* Un color de fondo para la sección del collage */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
 }
 
-/* Estilos para el componente ImageCollage (puedes ajustarlos en su propio archivo CSS si lo prefieres) */
-.imageCollage {
-    /* Estilos para el contenedor principal del collage */
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    /* Ejemplo de diseño de cuadrícula */
-    gap: 10px;
-    width: 100%;
-    max-width: 600px;
-    /* Ancho máximo del collage */
-}
-
-.collageImageContainer {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    /* Mantiene las imágenes cuadradas */
-    overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.collageImage {
+.backgroundVideo {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: -1;
 }
+
+.loginFormSection {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginCard {
+    background-color: rgba(170, 248, 255, 0.5);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    max-width: 150%;
+    color: #333;
+    text-align: center;
+    margin: auto;
+}
+
+/* --- Contenedor de login --- */
 
 .logoContainer {
     display: flex;
@@ -104,22 +60,22 @@
 }
 
 .logoImage {
-    width: 100%;
-    height: 100%;
+    width: 120%;
+    height: 120%;
     object-fit: cover;
 }
 
 .helloText {
-    font-size: 24px;
+    font-size: 35px;
     font-weight: bold;
-    color: #333;
+    color: #fe8a0f;
     margin-bottom: 5px;
     text-align: center;
 }
 
 .secondaryText {
-    color: #777;
-    font-size: 16px;
+    color: #5b136f;
+    font-size: 24px;
     text-align: center;
     margin-bottom: 20px;
 }
@@ -131,14 +87,15 @@
 }
 
 .label {
-    font-size: 16px;
-    color: #555;
+    font-size: 20px;
+    color: #5b136f;
     margin-bottom: 5px;
+    text-align: left;
 }
 
 .input {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #fe8a0f;
     border-radius: 5px;
     font-size: 16px;
 }
@@ -155,9 +112,9 @@
 
 .passwordToggle {
     position: absolute;
-    right: 10px;
+    right: 5px;
     cursor: pointer;
-    color: #777;
+    color: #fd4d01;
 }
 
 .loginButton {
@@ -175,25 +132,48 @@
     background-color: #0056b3;
 }
 
-/* Media query para pantallas más pequeñas (ejemplo) */
+.errorMessage {
+    color: #ff4d4f;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+
+/* --- Media query para pantallas más pequeñas --- */
 @media (max-width: 768px) {
+    .background-video {
+        display: none;
+    }
+
     .loginPageContainer {
-        flex-direction: column;
-        /* Apila las secciones en pantallas pequeñas */
+        background-image: url('/images/fondo_tomografia.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-color: #5ce7f1;
     }
 
     .loginFormSection {
-        width: 100%;
         padding: 20px;
+        width: 100%;
+        height: auto;
     }
 
     .loginCard {
-        width: 100%;
-        max-width: none;
+        width: 90%;
+        padding: 20px;
     }
 
-    .imageCollageSection {
-        width: 100%;
-        padding: 20px;
+    .logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .helloText {
+        font-size: 25px;
+    }
+
+    .secondaryText {
+        font-size: 20px;
     }
 }

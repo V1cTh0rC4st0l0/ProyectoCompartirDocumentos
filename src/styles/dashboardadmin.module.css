@@ -5,9 +5,8 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background-color: #f0f2f5;
     margin-top: -30px;
-    color: #333333;
+    color: #0c3c64;
     font-family: 'Inter', sans-serif;
 }
 
@@ -91,7 +90,7 @@
 .metricTitle {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #555;
+    color: #5b136f;
     margin-bottom: 1rem;
     border-bottom: 1px solid #eee;
     padding-bottom: 0.75rem;
@@ -159,7 +158,7 @@
 .sectionTitle {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #444;
+    color: #5b136f;
 }
 
 .sectionStats {

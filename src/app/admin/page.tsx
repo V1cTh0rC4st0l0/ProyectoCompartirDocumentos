@@ -6,7 +6,6 @@ import UserList from './components/UserList';
 import UserFileDetailsModalContent from './components/UserFileDetailsModalContent';
 import { FiSearch, FiEdit } from 'react-icons/fi';
 import styles from '@/styles/dashboardadmin.module.css';
-import ImageCollage from '@/components/ImageCollage';
 import ActivityLogCard from './components/ActivityLogCard';
 
 type FileData = {
@@ -332,13 +331,6 @@ export default function AdminDashboard() {
             <h2 className={styles.metricTitle}>Gestión de Usuarios</h2>
             <div className={styles.metricContent}>
               <UserList />
-            </div>
-          </div>
-
-          <div className={styles.metricCard}>
-            <h2 className={styles.metricTitle}>Collage</h2>
-            <div className={styles.metricContent}>
-              <ImageCollage />
             </div>
           </div>
 

@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/adminLayout.module.css';
-// import PanelDeOpciones from '@/components/PanelDeOpciones'; // ¡Eliminado!
-import ImageCollage from '@/components/ImageCollage';
 import CreateUserModal from '@/components/CreateUserModal';
 import UploadFilesModal from '@/components/UploadFilesModal';
 import UploadViewerModal from '@/components/UploadViewerModal';
@@ -12,8 +10,6 @@ import { FiMenu, FiX } from 'react-icons/fi';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    // const [isPanelOpen, setIsPanelOpen] = useState(false); // ¡Eliminado!
-    const [isCollageModalOpen, setIsCollageModalOpen] = useState(false);
     const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
     const [isUploadFilesModalOpen, setIsUploadFilesModalOpen] = useState(false);
     const [isUploadViewerModalOpen, setIsUploadViewerModalOpen] = useState(false);
@@ -31,24 +27,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    // const openPanel = () => { // ¡Eliminado!
-    //     setIsPanelOpen(true);
-    //     setIsSidebarOpen(false);
-    // };
-
-    // const closePanel = () => { // ¡Eliminado!
-    //     setIsPanelOpen(false);
-    // };
-
-    const openCollageModal = () => {
-        setIsCollageModalOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const closeCollageModal = () => {
-        setIsCollageModalOpen(false);
     };
 
     const openCreateUserModal = () => {
@@ -103,14 +81,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <button onClick={openCreateUserModal} className={styles.sidebarLink}>
                         Crear Usuario
                     </button>
-                    <button onClick={openCollageModal} className={styles.sidebarLink}>
-                        Editar Collage
-                    </button>
-                    {/* <button onClick={openPanel} className={styles.sidebarLink}> // ¡Eliminado!
-                        Opciones Extra
-                    </button> */}
                     <button onClick={openUploadViewerModal} className={styles.sidebarLink}>
-                        Subir Visor 3D
+                        Subir Aplicación
                     </button>
                 </nav>
             </aside>
@@ -118,17 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Contenido principal */}
             <main className={styles.mainContent}>{children}</main>
 
-            {/* Modales (mantienen la lógica existente) */}
-            {/* {isPanelOpen && ( // ¡Eliminado!
-                <div className={styles.modalOverlay} onClick={closePanel}>
-                    <PanelDeOpciones onClose={closePanel} />
-                </div>
-            )} */}
-            {isCollageModalOpen && (
-                <div className={styles.modalOverlay} onClick={closeCollageModal}>
-                    <ImageCollage isOpen={isCollageModalOpen} onClose={closeCollageModal} />
-                </div>
-            )}
+            {/* Modales */}
             {isCreateUserModalOpen && (
                 <div className={styles.modalOverlay} onClick={closeCreateUserModal}>
                     <CreateUserModal onClose={closeCreateUserModal} />

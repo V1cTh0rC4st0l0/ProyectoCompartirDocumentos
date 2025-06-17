@@ -4,7 +4,6 @@ import { useState } from 'react'
 import styles from '@/styles/login.module.css'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Image from 'next/image';
-import ImageCollage from '@/components/ImageCollage';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -46,6 +45,10 @@ export default function LoginPage() {
 
     return (
         <div className={styles.loginPageContainer}>
+            <video autoPlay loop muted className={styles.backgroundVideo}>
+                <source src="/videos/fondo_tomografia_video.mp4" type="video/mp4" />
+                Tu navegador no soporta el tag de video.
+            </video>
             <div className={styles.loginFormSection}>
                 <div className={styles.loginCard}>
                     <div className={styles.logoContainer}>
@@ -93,9 +96,6 @@ export default function LoginPage() {
                         {isLoading ? 'Iniciando sesión...' : 'Login'}
                     </button>
                 </div>
-            </div>
-            <div className={styles.imageCollageSection}>
-                <ImageCollage />
             </div>
         </div>
     )
