@@ -4,14 +4,14 @@
 import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 import Image from 'next/image';
-import { AiOutlineClose } from 'react-icons/ai'; // Para el botón de cerrar
-import styles from '@/styles/fileGroupModal.module.css'; // Nuevos estilos para este modal
+import { AiOutlineClose } from 'react-icons/ai';
+import styles from '@/styles/fileGroupModal.module.css';
 
 type FileData = {
     fileId: string;
     nombreArchivo: string;
     tipoArchivo: string;
-    ruta?: string; // Aunque no se usa directamente en este modal, es parte del tipo
+    ruta?: string;
 };
 
 type FileGroupModalProps = {
@@ -23,7 +23,6 @@ type FileGroupModalProps = {
     onClose: () => void;
 };
 
-// Función auxiliar para renderizar el icono del archivo (la misma que ya tienes)
 const renderFileIcon = (file: FileData) => {
     if (file.tipoArchivo.startsWith('image/')) {
         return (
@@ -74,15 +73,6 @@ export default function FileGroupModal({ group, onClose }: FileGroupModalProps) 
         window.location.href = `/api/files/${fileId}`;
     };
 
-    {/*const handleDownloadGroup = (groupId: string) => {
-        if (!groupId) {
-            console.error('No se proporcionó un ID de grupo para descargar.');
-            alert('Error: ID de grupo no disponible.');
-            return;
-        }
-        window.location.href = `/api/file-groups/download/${groupId}`;
-    };*/}
-
     return (
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -91,12 +81,6 @@ export default function FileGroupModal({ group, onClose }: FileGroupModalProps) 
                 </button>
                 <h2 className={styles.modalTitle}>{group.nombreGrupo}</h2>
                 <div className={styles.modalHeaderActions}>
-                    {/*<button
-                        onClick={() => handleDownloadGroup(group._id)}
-                        className={styles.downloadGroupButton}
-                    >
-                        <FiDownload className="mr-2" /> Descargar Grupo Completo
-                    </button>*/}
                 </div>
 
                 <div className={styles.filesGrid}>

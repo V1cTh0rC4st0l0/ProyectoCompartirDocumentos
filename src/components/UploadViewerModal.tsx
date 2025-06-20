@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import axios from 'axios';
-import styles from '@/styles/adminLayout.module.css'; // Reutiliza los estilos del layout para el overlay
+import styles from '@/styles/adminLayout.module.css';
 
 interface UploadViewerModalProps {
     onClose: () => void;
@@ -50,27 +50,22 @@ export default function UploadViewerModal({ onClose }: UploadViewerModalProps) {
                 setMessage(`¡Éxito! ${res.data.message} ID: ${res.data.fileId}`);
                 setIsError(false);
                 setSelectedFile(null);
-                // No cerramos el modal automáticamente, damos feedback al usuario
             } else {
                 setMessage(`Error: ${res.data.message}`);
                 setIsError(true);
             }
-        } catch (error: unknown) { // 'unknown' es más seguro que 'any'
+        } catch (error: unknown) {
             console.error('Error al subir el archivo:', error);
 
             let errorMessage = 'Error desconocido al subir el visor.';
 
-            // Comprobar si es un error de Axios
             if (axios.isAxiosError(error)) {
-                // Si el error tiene una respuesta y datos con un mensaje
                 if (error.response?.data?.message) {
                     errorMessage = `Error al subir: ${error.response.data.message}`;
                 } else if (error.message) {
-                    // Si no hay mensaje específico de la API, usar el mensaje del error de Axios
                     errorMessage = `Error al subir: ${error.message}`;
                 }
             } else if (error instanceof Error) {
-                // Si es una instancia de Error estándar
                 errorMessage = `Error al subir: ${error.message}`;
             }
 
@@ -82,7 +77,7 @@ export default function UploadViewerModal({ onClose }: UploadViewerModalProps) {
     };
 
     return (
-        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}> {/* Previene que el click en el modal cierre el overlay */}
+        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.modalTitle}>Subir Visor 3D</h2>
             <div className="p-4 border rounded shadow bg-white flex flex-col gap-3">
                 <input

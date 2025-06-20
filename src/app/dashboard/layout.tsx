@@ -31,17 +31,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <div className={styles.dashboardLayoutContainer}>
-            {/* Botón de menú para móviles */}
             <button className={styles.menuButton} onClick={toggleSidebar}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
             </button>
-
-            {/* Overlay para cuando el sidebar está abierto en móvil */}
             {isSidebarOpen && (
                 <div className={styles.overlay + ' ' + styles.show} onClick={toggleSidebar}></div>
             )}
 
-            {/* Sidebar */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
                 <h2 className={styles.sidebarTitle}>RAXVEL</h2>
                 <ul className={styles.sidebarNav}>
@@ -50,13 +46,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             Salir
                         </Link>
                     </li>
-                    <li className="mt-6"> {/* Puedes dejar esta clase de Tailwind o moverla al CSS Module si lo prefieres */}
+                    <li className="mt-6">
                         <DownloadViewerButton />
                     </li>
                 </ul>
             </aside>
-
-            {/* El contenido de tu page.tsx se renderizará aquí */}
             <main className={styles.mainContent}>
                 {children}
             </main>

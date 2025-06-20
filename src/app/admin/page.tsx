@@ -30,7 +30,7 @@ type User = {
   sharedFileGroups?: FileGroup[];
   totalFilesSharedByThisUser?: number;
   totalFilesSharedWithThisUser?: number;
-  lastActivityDate?: string | null; // Nuevo campo para la fecha de última actividad
+  lastActivityDate?: string | null;
 };
 
 export default function AdminDashboard() {
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     const dateA = a.lastActivityDate ? new Date(a.lastActivityDate).getTime() : 0;
     const dateB = b.lastActivityDate ? new Date(b.lastActivityDate).getTime() : 0;
-    return dateB - dateA; // De más reciente a menos reciente
+    return dateB - dateA;
   });
 
   const [isDarkMode, setIsDarkMode] = useState(false);

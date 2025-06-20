@@ -7,7 +7,7 @@ interface PanelDeOpcionesProps {
 
 const PanelDeOpciones: React.FC<PanelDeOpcionesProps> = ({ onClose }) => {
     return (
-        <div className={styles.panelContainer} onClick={(e) => e.stopPropagation()}> {/* Evita que el clic cierre el modal */}
+        <div className={styles.panelContainer} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.panelTitle}>Opciones Extra</h2>
             <p>Aquí puedes colocar el contenido de tu panel.</p>
             <ul>

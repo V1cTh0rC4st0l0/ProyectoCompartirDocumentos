@@ -14,10 +14,10 @@ interface IActivityLog {
         fileName?: string;
         groupName?: string;
         sharedWithUsernames?: string;
-        oldValue?: unknown; // CORRECCIÓN: Usar unknown en lugar de any
-        newValue?: unknown; // CORRECCIÓN: Usar unknown en lugar de any
-        isNewGroup?: boolean; // Añadir si se usa en el backend
-        addedToExistingGroup?: boolean; // Añadir si se usa en el backend
+        oldValue?: unknown;
+        newValue?: unknown;
+        isNewGroup?: boolean;
+        addedToExistingGroup?: boolean;
     };
     timestamp: string;
 }
@@ -96,9 +96,9 @@ export default function ActivityLogCard() {
 
         switch (log.action) {
             case 'upload':
-                message += `subió al grupo <strong>"${log.details.groupName}"</strong>`; // Cambiamos a grupo
+                message += `subió al grupo <strong>"${log.details.groupName}"</strong>`;
                 if (log.details.fileName) {
-                    message += ` los archivos: ${log.details.fileName}`; // Añadimos los archivos
+                    message += ` los archivos: ${log.details.fileName}`;
                 }
                 if (log.details.sharedWithUsernames) {
                     message += `, compartido con <strong>${log.details.sharedWithUsernames}</strong>.`;

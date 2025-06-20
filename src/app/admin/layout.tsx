@@ -58,17 +58,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className={styles.dashboardLayoutContainer}>
-            {/* Botón de menú para móviles */}
             <button className={styles.menuButton} onClick={toggleSidebar}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
             </button>
-
-            {/* Overlay para cuando el sidebar está abierto en móvil */}
             {isSidebarOpen && (
                 <div className={styles.overlay + ' ' + styles.show} onClick={toggleSidebar}></div>
             )}
 
-            {/* Sidebar */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
                 <h1 className={styles.sidebarTitle}>Raxvel</h1>
                 <nav className={styles.sidebarNav}>
@@ -87,10 +83,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </nav>
             </aside>
 
-            {/* Contenido principal */}
             <main className={styles.mainContent}>{children}</main>
-
-            {/* Modales */}
             {isCreateUserModalOpen && (
                 <div className={styles.modalOverlay} onClick={closeCreateUserModal}>
                     <CreateUserModal onClose={closeCreateUserModal} />

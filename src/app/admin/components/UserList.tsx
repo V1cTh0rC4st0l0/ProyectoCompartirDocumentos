@@ -1,13 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-// Definimos la interfaz completa del usuario
 interface User {
     _id: string;
     username: string;
-    email: string; // Añadimos el campo email
+    email: string;
     rol: string;
-    // La contraseña no se trae al frontend por seguridad
 }
 
 export default function UserList() {
@@ -15,20 +13,19 @@ export default function UserList() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState<{
         username: string;
-        email: string; // Estado para el email en el formulario de edición
-        password: string; // Estado para la nueva contraseña (se enviará solo si se cambia)
+        email: string;
+        password: string;
         rol: string;
     }>({
         username: '',
         email: '',
-        password: '', // Inicialmente vacío
+        password: '',
         rol: 'usuario',
     });
-    const [message, setMessage] = useState<string | null>(null); // Mensajes para el usuario
-    const [isSuccess, setIsSuccess] = useState<boolean | null>(null); // Estado de éxito/error del mensaje
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null); // Estado para el ID del usuario a confirmar eliminación
+    const [message, setMessage] = useState<string | null>(null);
+    const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
-    // Función para obtener la lista de usuarios
     const fetchUsers = async () => {
         setMessage(null);
         setIsSuccess(null);
@@ -46,7 +43,6 @@ export default function UserList() {
         }
     };
 
-    // Función para eliminar un usuario
     const handleDeleteUser = async (id: string) => {
         setMessage(null);
         setIsSuccess(null);
@@ -58,66 +54,59 @@ export default function UserList() {
             }
             setMessage(data.message || 'Usuario eliminado exitosamente.');
             setIsSuccess(true);
-            fetchUsers(); // Recargar la lista después de eliminar
+            fetchUsers();
         } catch (error: unknown) {
             console.error("Error deleting user:", error);
             setMessage('Error al eliminar usuario.');
             setIsSuccess(false);
         } finally {
-            setShowDeleteConfirm(null); // Cerrar la confirmación
+            setShowDeleteConfirm(null);
         }
     };
 
-    // Iniciar el modo de edición para un usuario
     const startEdit = (user: User) => {
         setEditingId(user._id);
-        // Poblar el formulario de edición con los datos actuales del usuario
-        // La contraseña se deja vacía por seguridad, el usuario debe introducirla para cambiarla
         setEditForm({ username: user.username, email: user.email, password: '', rol: user.rol });
-        setMessage(null); // Limpiar mensajes al iniciar edición
+        setMessage(null);
         setIsSuccess(null);
     };
 
-    // Cancelar el modo de edición
     const cancelEdit = () => {
         setEditingId(null);
         setEditForm({ username: '', email: '', password: '', rol: 'usuario' });
-        setMessage(null); // Limpiar mensajes
+        setMessage(null);
         setIsSuccess(null);
     };
 
-    // Guardar los cambios de un usuario editado
     const saveEdit = async () => {
-        if (!editingId) return; // Asegurarse de que hay un ID en edición
+        if (!editingId) return;
 
         setMessage(null);
         setIsSuccess(null);
 
-        // Objeto con los datos a enviar
         const dataToUpdate: { username: string; email: string; password?: string; rol: string } = {
             username: editForm.username,
             email: editForm.email,
             rol: editForm.rol,
         };
 
-        // Solo añadir la contraseña si el campo no está vacío
         if (editForm.password) {
             dataToUpdate.password = editForm.password;
         }
 
         try {
-            const res = await fetch(`/api/users`, { // La API PUT debería manejar el ID en el body o query
+            const res = await fetch(`/api/users`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: editingId, ...dataToUpdate }), // Incluimos el ID y los datos
+                body: JSON.stringify({ id: editingId, ...dataToUpdate }),
             });
             const data = await res.json();
 
             if (res.ok) {
                 setMessage(data.message || 'Usuario actualizado exitosamente.');
                 setIsSuccess(true);
-                cancelEdit(); // Salir del modo de edición
-                fetchUsers(); // Recargar la lista
+                cancelEdit();
+                fetchUsers();
             } else {
                 setMessage(data.message || 'Error al actualizar usuario.');
                 setIsSuccess(false);
@@ -129,7 +118,6 @@ export default function UserList() {
         }
     };
 
-    // Hook para cargar usuarios al inicio
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -138,7 +126,6 @@ export default function UserList() {
         <div className="p-4 bg-white rounded-lg shadow-md">
             <h3 className="text-xl font-semibold mb-4 text-gray-800">Lista de Usuarios</h3>
 
-            {/* Mensajes de éxito/error */}
             {message && (
                 <div className={`mb-4 p-3 rounded-md text-center ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                     {message}
@@ -153,7 +140,6 @@ export default function UserList() {
                         users.map((user) => (
                             <li key={user._id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b pb-3 pt-2 last:border-b-0">
                                 {editingId === user._id ? (
-                                    // Modo de edición
                                     <div className="flex flex-col gap-3 w-full">
                                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
                                             <label className="sr-only" htmlFor={`edit-username-${user._id}`}>Nombre de usuario</label>
@@ -201,17 +187,16 @@ export default function UserList() {
                                         </div>
                                     </div>
                                 ) : (
-                                    // Modo de visualización
                                     <div className="flex justify-between w-full items-center">
                                         <div className="flex flex-col text-gray-700">
                                             <span className="font-medium text-lg">{user.username}</span>
-                                            <span className="text-sm text-gray-500">{user.email}</span> {/* Mostrar el email */}
+                                            <span className="text-sm text-gray-500">{user.email}</span>
                                             <span className="text-sm capitalize text-gray-500">Rol: {user.rol}</span>
                                         </div>
                                         <div className="flex gap-2">
                                             <button onClick={() => startEdit(user)} className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">Editar</button>
                                             <button
-                                                onClick={() => setShowDeleteConfirm(user._id)} // Abre la confirmación
+                                                onClick={() => setShowDeleteConfirm(user._id)}
                                                 className="text-red-600 hover:text-red-800 font-medium text-sm transition-colors"
                                             >
                                                 Eliminar
@@ -225,7 +210,6 @@ export default function UserList() {
                 </ul>
             </div>
 
-            {/* Modal de Confirmación de Eliminación */}
             {showDeleteConfirm && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">

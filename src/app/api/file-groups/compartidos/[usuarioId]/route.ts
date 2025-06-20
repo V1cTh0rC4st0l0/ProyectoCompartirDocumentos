@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import FileGroup from '@/models/FileGroup';
-import mongoose from 'mongoose'; // Necesario para mongoose.Types.ObjectId.isValid
+import mongoose from 'mongoose';
 
 export async function GET(
     request: NextRequest,

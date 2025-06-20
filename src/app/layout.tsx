@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Raxvel",
-  description: "Plataforma para compartir y gestionar archivos.",
+  description: "Raxvel | Plataforma WEB del Consultorio Dental en Tepeaca, Puebla. Expertos en odontología general, radiografías y tomografías 3D para tu salud bucal completa.",
 };
 
 export default function RootLayout({

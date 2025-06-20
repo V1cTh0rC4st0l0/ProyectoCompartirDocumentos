@@ -42,23 +42,17 @@ export async function GET() {
                     totalFilesSharedWithThisUser += group.archivos.length;
                 });
 
-                // --- NUEVA LÓGICA PARA LA ÚLTIMA ACTIVIDAD ---
                 let lastActivityDate: Date | null = null;
-
-                // Considerar la fecha de creación de los grupos que el usuario posee
                 createdFileGroups.forEach(group => {
                     if (group.fechaCreacion && (!lastActivityDate || group.fechaCreacion > lastActivityDate)) {
                         lastActivityDate = group.fechaCreacion;
                     }
                 });
-
-                // Considerar la fecha de creación de los grupos que han sido compartidos con el usuario
                 sharedFileGroups.forEach(group => {
                     if (group.fechaCreacion && (!lastActivityDate || group.fechaCreacion > lastActivityDate)) {
                         lastActivityDate = group.fechaCreacion;
                     }
                 });
-                // --- FIN NUEVA LÓGICA ---
 
                 return {
                     ...user,
@@ -71,13 +65,9 @@ export async function GET() {
             })
         );
 
-        // Ordenar los usuarios aquí en el backend antes de enviarlos al frontend
-        // para que el frontend reciba los datos ya ordenados por última actividad.
         usersWithFileData.sort((a, b) => {
             const dateA = a.lastActivityDate ? new Date(a.lastActivityDate).getTime() : 0;
             const dateB = b.lastActivityDate ? new Date(b.lastActivityDate).getTime() : 0;
-
-            // Ordenar de más reciente (mayor timestamp) a menos reciente
             return dateB - dateA;
         });
 
