@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import UserList from './components/UserList';
 import UserFileDetailsModalContent from './components/UserFileDetailsModalContent';
-import { FiSearch, FiEdit } from 'react-icons/fi';
+import { FiSearch, FiEdit, FiMoon, FiSun } from 'react-icons/fi';
 import styles from '@/styles/dashboardadmin.module.css';
 import ActivityLogCard from './components/ActivityLogCard';
 
@@ -94,6 +94,12 @@ export default function AdminDashboard() {
     const dateB = b.lastActivityDate ? new Date(b.lastActivityDate).getTime() : 0;
     return dateB - dateA; // De más reciente a menos reciente
   });
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   const handleDownloadGroup = (groupId: string) => {
     if (!groupId) {
@@ -233,7 +239,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className={styles.dashboardContainer}>
+    <div className={`${styles.dashboardContainer} ${isDarkMode ? styles.darkMode : ''}`}>
       <main className={styles.mainContent}>
         <header className={styles.header}>
           <div className={styles.searchBar}>
@@ -246,6 +252,9 @@ export default function AdminDashboard() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+          <button onClick={toggleDarkMode} className={styles.themeToggle}>
+            {isDarkMode ? <FiSun /> : <FiMoon />}
+          </button>
         </header>
         <section className={styles.userFilesSection}>
           <div className={styles.sectionHeader}>

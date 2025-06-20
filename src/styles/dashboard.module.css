@@ -11,17 +11,48 @@
     padding: 1.5rem 2rem;
     border-bottom: 1px solid #e0e0e0;
     display: flex;
-    justify-content: flex-start;
-    border-radius: 12px;
+    justify-content: space-between;
     align-items: center;
+    border-radius: 12px;
     box-shadow: 0 4px 12px rgb(52, 132, 193);
+    flex-wrap: wrap;
 }
 
 .headerTitle {
     font-size: 2.5rem;
     font-weight: bold;
     color: #2d3748;
-    text-align: center;
+    text-align: left;
+    margin: 0;
+}
+
+.searchBar {
+    position: relative;
+    width: 300px;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #5ce7f1;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    background-color: #f9f9f9;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .loadingMessage,
@@ -64,23 +95,18 @@
     align-items: center;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
-    /* Permite que los elementos se envuelvan en pantallas pequeñas */
     gap: 1rem;
-    /* Espacio entre título y botón */
 }
 
 .groupTitle {
     font-size: 1.6rem;
     font-weight: bold;
     color: #2b6cb0;
-    /* Un color distintivo para el título del grupo */
     flex-grow: 1;
-    /* Permite que el título ocupe el espacio disponible */
 }
 
 .downloadGroupButton {
     background-color: #4299e1;
-    /* Azul de Tailwind CSS */
     color: white;
     padding: 0.75rem 1.25rem;
     border: none;
@@ -100,11 +126,8 @@
 
 .filesGrid {
     display: grid;
-    /* Ajusta minmax para controlar el tamaño de las tarjetas y el número de columnas */
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    /* Más espacio para los nombres de archivo */
     gap: 1rem;
-    /* Espacio entre las tarjetas */
 }
 
 .fileCard {
@@ -119,9 +142,7 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     transition: transform 0.2s ease-in-out;
     min-height: 150px;
-    /* Mantener la altura para consistencia */
     justify-content: space-between;
-    /* Empuja el botón de descarga hacia abajo */
 }
 
 .fileCard:hover {
@@ -135,7 +156,6 @@
     justify-content: center;
     align-items: center;
     height: 70px;
-    /* Altura fija para los contenedores de iconos/imágenes */
 }
 
 .iconImage {
@@ -170,7 +190,6 @@
     gap: 0.25rem;
     width: fit-content;
     margin-top: auto;
-    /* Empuja el botón hacia la parte inferior de la tarjeta */
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -178,10 +197,8 @@
     background-color: #2f855a;
 }
 
-/* **Nuevos estilos para el "Ver más"** */
 .viewMoreCard {
     background-color: #edf2f7;
-    /* Fondo más claro para el "Ver más" */
     border: 1px solid #cbd5e0;
     border-radius: 0.5rem;
     padding: 1rem;
@@ -194,13 +211,11 @@
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
     transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
     min-height: 150px;
-    /* Igualar altura a las fileCard */
 }
 
 .viewMoreCard:hover {
     transform: translateY(-3px);
     background-color: #e2e8f0;
-    /* Un poco más oscuro al pasar el ratón */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -216,7 +231,6 @@
     color: #2b6cb0;
     font-weight: bold;
 }
-
 
 /* Responsividad */
 @media (max-width: 768px) {
@@ -278,4 +292,70 @@
     .viewMoreIcon {
         font-size: 1.8rem;
     }
+}
+
+/* DARK MODE */
+.darkMode {
+    background-color: #1a202c;
+    color: #e2e8f0;
+}
+
+.darkMode .header {
+    background-color: #2d3748;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.darkMode .headerTitle {
+    color: #e2e8f0;
+}
+
+.darkMode .searchInput {
+    background-color: #4a5568;
+    color: #edf2f7;
+    border-color: #718096;
+}
+
+.darkMode .fileGroup {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+}
+
+.darkMode .fileCard {
+    background-color: #4a5568;
+    border-color: #718096;
+}
+
+.darkMode .fileName {
+    color: #edf2f7;
+}
+
+.darkMode .viewMoreCard {
+    background-color: #4a5568;
+    border-color: #718096;
+    color: #e2e8f0;
+}
+
+.darkMode .iconImage {
+    filter: brightness(0.7);
+}
+
+/* BOTÓN DE TEMA */
+.themeToggle {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    margin-left: 1rem;
+    cursor: pointer;
+    color: #38bdf8;
+    transition: transform 0.2s ease;
+}
+
+.themeToggle:hover {
+    transform: scale(1.1);
+}
+
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }

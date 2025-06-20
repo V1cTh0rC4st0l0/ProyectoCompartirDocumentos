@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Image from 'next/image';
-import { FiDownload, FiFile, FiFileText } from 'react-icons/fi';
+import { FiDownload, FiFile, FiFileText, FiSearch, FiSun, FiMoon } from 'react-icons/fi';
 import { FaFilePdf, FaFileArchive } from 'react-icons/fa';
 import styles from '@/styles/dashboard.module.css';
 import FileGroupModal from '@/components/FileGroupModal';
@@ -28,9 +28,15 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<FileGroup | null>(null);
-    const [userName, setUserName] = useState<string>(''); // <-- Nuevo estado para el nombre del usuario
+    const [userName, setUserName] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     const GROUP_FILE_DISPLAY_LIMIT = 2;
+
+    const toggleDarkMode = () => {
+        setIsDarkMode(!isDarkMode);
+    };
 
     useEffect(() => {
         const fetchGroups = async () => {
@@ -39,28 +45,24 @@ export default function DashboardPage() {
                     withCredentials: true,
                 });
 
-                // --- INICIO DE CAMBIO ---
-                // La API ahora devuelve un objeto con 'userName' y 'fileGroups'
                 const { userName, fileGroups } = res.data;
 
-                setUserName(userName || ''); // Guardar el nombre del usuario
+                setUserName(userName || '');
                 if (Array.isArray(fileGroups)) {
-                    setFileGroups(fileGroups);
+                    setFileGroups(fileGroups.slice().reverse());
                 } else {
                     console.warn('API returned unexpected data for file groups (not an array):', fileGroups);
                     setFileGroups([]);
                 }
-                // --- FIN DE CAMBIO ---
 
             } catch (err: unknown) {
                 console.error('Error al cargar grupos de archivos', err);
                 let errorMessage = 'No se pudieron cargar los archivos compartidos. Por favor, inténtalo de nuevo más tarde.';
 
                 if (axios.isAxiosError(err)) {
-                    if (err.response?.status === 401) { // Manejar específicamente errores de autenticación
+                    if (err.response?.status === 401) {
                         errorMessage = 'Su sesión ha expirado o no está autenticado. Por favor, inicie sesión de nuevo.';
-                        // Opcional: Redirigir al usuario a la página de login
-                        // window.location.href = '/login';
+                        window.location.href = '/login';
                     } else if (err.response?.data?.message) {
                         errorMessage = err.response.data.message;
                     } else if (err.message) {
@@ -72,7 +74,7 @@ export default function DashboardPage() {
 
                 setError(errorMessage);
                 setFileGroups([]);
-                setUserName(''); // Limpiar el nombre en caso de error
+                setUserName('');
             } finally {
                 setLoading(false);
             }
@@ -80,20 +82,6 @@ export default function DashboardPage() {
 
         fetchGroups();
     }, []);
-
-    {/*const handleDownloadGroup = async (groupId: string) => {
-        if (!groupId) {
-            console.error('No se proporcionó un ID de grupo para descargar.');
-            alert('Error: ID de grupo no disponible.');
-            return;
-        }
-        try {
-            window.location.href = `/api/file-groups/download/${groupId}`;
-        } catch (error) {
-            console.error('Error al iniciar la descarga del grupo:', error);
-            alert('Hubo un error al intentar descargar el grupo de archivos.');
-        }
-    };*/}
 
     const handleDownloadFile = (fileId: string) => {
         if (!fileId) {
@@ -154,12 +142,24 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className={styles.dashboardContainer}>
+        <div className={`${styles.dashboardContainer} ${isDarkMode ? styles.darkMode : ''}`}>
             <header className={styles.header}>
-                {/* Usa el estado `userName` aquí */}
-                <h1 className={styles.headerTitle}>
-                    ¡Hola Doctor {userName || '...'}{/* Muestra '...' mientras carga o si no hay nombre */}!
-                </h1>
+                <h1 className={styles.headerTitle}>¡Hola {userName || 'Doctor'}!</h1>
+                <div className={styles.headerRight}>
+                    <div className={styles.searchBar}>
+                        <FiSearch className={styles.searchIcon} />
+                        <input
+                            type="text"
+                            placeholder="Buscar..."
+                            className={styles.searchInput}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button onClick={toggleDarkMode} className={styles.themeToggle}>
+                        {isDarkMode ? <FiSun /> : <FiMoon />}
+                    </button>
+                </div>
             </header>
 
             {loading ? (
@@ -169,44 +169,42 @@ export default function DashboardPage() {
             ) : fileGroups.length === 0 ? (
                 <p className={styles.noFilesMessage}>No hay grupos de archivos compartidos con Usted.</p>
             ) : (
-                fileGroups.map((group) => (
-                    <div key={group._id} className={styles.fileGroup}>
-                        <div className={styles.groupHeader}>
-                            <h2 className={styles.groupTitle}>{group.nombreGrupo}</h2>
-                            {/*<button
-                                onClick={() => handleDownloadGroup(group._id)}
-                                className={styles.downloadGroupButton}
-                            >
-                                <FiDownload className="mr-2" /> Descargar Grupo
-                            </button>*/}
-                        </div>
-                        <div className={styles.filesGrid}>
-                            {group.archivos.slice(0, GROUP_FILE_DISPLAY_LIMIT).map((file) => (
-                                <div
-                                    key={file.fileId}
-                                    className={styles.fileCard}
-                                >
-                                    <div className={styles.fileIconContainer}>
-                                        {renderFileIcon(file)}
-                                    </div>
-                                    <p className={styles.fileName}>{file.nombreArchivo}</p>
-                                    <button
-                                        onClick={() => handleDownloadFile(file.fileId)}
-                                        className={styles.downloadFileButton}
+                fileGroups
+                    .filter(group =>
+                        group.nombreGrupo.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((group) => (
+                        <div key={group._id} className={styles.fileGroup}>
+                            <div className={styles.groupHeader}>
+                                <h2 className={styles.groupTitle}>{group.nombreGrupo}</h2>
+                            </div>
+                            <div className={styles.filesGrid}>
+                                {group.archivos.slice(0, GROUP_FILE_DISPLAY_LIMIT).map((file) => (
+                                    <div
+                                        key={file.fileId}
+                                        className={styles.fileCard}
                                     >
-                                        <FiDownload className="mr-1" /> Descargar
-                                    </button>
-                                </div>
-                            ))}
-                            {group.archivos.length > GROUP_FILE_DISPLAY_LIMIT && (
-                                <div className={styles.viewMoreCard} onClick={() => handleOpenModal(group)}>
-                                    <p className={styles.viewMoreText}>Ver {group.archivos.length - GROUP_FILE_DISPLAY_LIMIT} archivo(s) más</p>
-                                    <p className={styles.viewMoreIcon}>+</p>
-                                </div>
-                            )}
+                                        <div className={styles.fileIconContainer}>
+                                            {renderFileIcon(file)}
+                                        </div>
+                                        <p className={styles.fileName}>{file.nombreArchivo}</p>
+                                        <button
+                                            onClick={() => handleDownloadFile(file.fileId)}
+                                            className={styles.downloadFileButton}
+                                        >
+                                            <FiDownload className="mr-1" /> Descargar
+                                        </button>
+                                    </div>
+                                ))}
+                                {group.archivos.length > GROUP_FILE_DISPLAY_LIMIT && (
+                                    <div className={styles.viewMoreCard} onClick={() => handleOpenModal(group)}>
+                                        <p className={styles.viewMoreText}>Ver {group.archivos.length - GROUP_FILE_DISPLAY_LIMIT} archivo(s) más</p>
+                                        <p className={styles.viewMoreIcon}>+</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))
+                    ))
             )}
 
             {isModalOpen && selectedGroup && (
