@@ -52,9 +52,8 @@ export default function DownloadViewerButton() {
     return (
         <button
             onClick={handleDownload}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded flex items-center text-sm mt-4"
         >
-            <FiDownload className="mr-2" /> Descargar {viewerInfo.fileName.replace('.exe', '') || 'Visor 3D'}
+            <FiDownload /> Descargar {viewerInfo.fileName.replace('.exe', '') || 'Visor 3D'}
         </button>
     );
 }

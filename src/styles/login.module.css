@@ -1,103 +1,232 @@
-/* src/styles/login.module.css */
+/* --- PALETA DE COLORES RAXVEL --- 
+   Naranja: #fe8a0f | Azul: #0050b5 | Cian: #00d1ff | Morado: #5b136f
+---------------------------------- */
 
-.loginPageContainer {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.mainWrapper {
+    background-color: white;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.backgroundVideo {
-    position: absolute;
+/* --- Header & Logo Central --- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+
+    /* Cambios clave aquí: */
+    position: fixed;
+    /* Lo fija a la pantalla */
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -1;
+    z-index: 1000;
+    /* Un número muy alto para que siempre esté al frente */
+
+    /* Opcional: un ligero fondo difuminado para que se lea bien sobre el collage */
+    background: rgba(176, 225, 243, 0.547);
+    backdrop-filter: blur(5px);
+    transition: background 0.3s ease;
 }
 
-.loginFormSection {
+.logoCentral {
     position: relative;
-    z-index: 1;
+    top: 15px;
+}
+
+.logoCircle {
+    background: white;
+    padding: 10px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.navLeft,
+.navRight {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.navLeft a,
+.navRight a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.navLeft a:hover,
+.navRight a:hover {
+    color: #fe8a0f;
+}
+
+.contactBtn {
+    background: #00d1ff;
+    /* Cian del logo */
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.contactBtn:hover {
+    transform: scale(1.05);
+}
+
+/* --- Hero Section --- */
+.heroSection {
+    height: 90vh;
+    position: relative;
+    overflow: hidden;
+    background: #000a1a;
+    /* Si el header es muy alto, puedes añadir un padding-top 
+       para que el texto del hero no quede tan arriba */
+    padding-top: 80px;
+}
+
+.heroContent {
+    color: white;
+    max-width: 750px;
+    z-index: 2;
+}
+
+.subTitle {
+    color: #00d1ff;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.mainTitle {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 10px 0;
+}
+
+.mainTitle span {
+    color: #00d1ff;
+    /* Resalte en Cian */
+}
+
+.description {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+.heroActions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.primaryBtn {
+    background: #fe8a0f;
+    /* Naranja del logo */
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(254, 138, 15, 0.3);
+}
+
+.phoneBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.iconCircle {
+    background: #00d1ff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 1.1rem;
+}
+
+/* --- Wave Decoration --- */
+.waveContainer {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+}
+
+/* --- Login Section (Debajo del Hero) --- */
+.loginWrapper {
+    padding: 80px 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
 }
 
 .loginCard {
-    background-color: rgba(170, 248, 255, 0.5);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 500px;
-    max-width: 150%;
-    color: #333;
-    text-align: center;
-    margin: auto;
-}
-
-/* --- Contenedor de login --- */
-
-.logoContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.logo {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #eee;
-}
-
-.logoImage {
-    width: 120%;
-    height: 120%;
-    object-fit: cover;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
 }
 
 .helloText {
-    font-size: 35px;
+    font-size: 30px;
     font-weight: bold;
     color: #fe8a0f;
+    /* Naranja */
     margin-bottom: 5px;
     text-align: center;
 }
 
 .secondaryText {
     color: #5b136f;
-    font-size: 24px;
+    /* Morado */
+    font-size: 18px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .inputGroup {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .label {
-    font-size: 20px;
+    font-size: 16px;
     color: #5b136f;
-    margin-bottom: 5px;
-    text-align: left;
+    /* Morado */
+    margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .input {
-    padding: 10px;
-    border: 1px solid #fe8a0f;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 1.5px solid #eee;
+    border-radius: 10px;
     font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #00d1ff;
 }
 
 .passwordInputContainer {
@@ -106,74 +235,561 @@
     align-items: center;
 }
 
-.passwordInput {
-    padding-right: 35px;
-}
-
 .passwordToggle {
     position: absolute;
-    right: 5px;
+    right: 15px;
     cursor: pointer;
-    color: #fd4d01;
+    color: #fe8a0f;
+    display: flex;
 }
 
 .loginButton {
-    background-color: #007bff;
+    background-color: #0050b5;
+    /* Azul del logo */
     color: white;
-    padding: 12px;
+    padding: 14px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
     width: 100%;
+    margin-top: 10px;
+    transition: background 0.3s;
 }
 
 .loginButton:hover {
-    background-color: #0056b3;
+    background-color: #003d8a;
 }
 
 .errorMessage {
     color: #ff4d4f;
-    margin-top: 10px;
+    margin-top: 15px;
+    text-align: center;
     font-size: 14px;
 }
 
-
-/* --- Media query para pantallas más pequeñas --- */
+/* --- Responsividad --- */
 @media (max-width: 768px) {
-    .background-video {
+    .header {
+        flex-direction: column;
+        padding-top: 60px;
+    }
+
+    .navLeft,
+    .navRight {
         display: none;
     }
 
-    .loginPageContainer {
-        background-image: url('/images/fondo_tomografia.jpg');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-color: #5ce7f1;
+    /* Ocultar menú en móvil para simplicidad */
+
+    .mainTitle {
+        font-size: 2.5rem;
     }
 
-    .loginFormSection {
-        padding: 20px;
-        width: 100%;
-        height: auto;
+    .heroSection {
+        height: 70vh;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .heroActions {
+        flex-direction: column;
     }
 
     .loginCard {
         width: 90%;
-        padding: 20px;
+        margin: 0 20px;
+    }
+}
+
+.mainWrapper {
+    background-color: white;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5%;
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+}
+
+.logoCentral {
+    position: relative;
+    top: 15px;
+}
+
+.logoCircle {
+    background: white;
+    padding: 10px;
+    border-radius: 0 0 50px 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.navLeft,
+.navRight {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.navLeft a,
+.navRight a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+}
+
+.contactBtn {
+    background: #00d1ff;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Hero & Collage */
+.heroSection {
+    height: 90vh;
+    /* Un poco más alto para apreciar el caos */
+    position: relative;
+    overflow: hidden;
+    background: #000a1a;
+}
+
+.collageContainer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* Reparte los carriles verticalmente */
+    opacity: 0.8;
+    /* Unifica el collage de fondo */
+    z-index: 1;
+}
+
+.collageTrack {
+    display: flex;
+    width: max-content;
+    gap: 10px;
+    /* Separación horizontal */
+    padding: 10px 0;
+}
+
+.collageItem {
+    position: relative;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.imgCollage {
+    object-fit: cover;
+}
+
+/* --- EFECTO CAÓTICO: TAMAÑOS --- */
+.itemSmall {
+    width: 120px;
+    height: 180px;
+}
+
+.itemBig {
+    width: 260px;
+    height: 320px;
+}
+
+/* Imagen mucho más grande */
+
+/* --- EFECTO CAÓTICO: ALINEACIONES (Unas arriba, otras abajo) --- */
+.alignTop {
+    align-self: flex-start;
+}
+
+.alignBottom {
+    align-self: flex-end;
+}
+
+.alignCenter {
+    align-self: center;
+}
+
+/* --- EFECTO CAÓTICO: VELOCIDADES DE ANIMACIÓN --- */
+.track1 {
+    animation: scrollCollage 55s linear infinite;
+}
+
+/* Lento */
+.track2 {
+    animation: scrollCollage 35s linear infinite;
+}
+
+/* Rápido (Centro) */
+.track3 {
+    animation: scrollCollage 45s linear infinite;
+}
+
+/* Medio */
+
+@keyframes scrollCollage {
+    0% {
+        transform: translateX(0);
     }
 
-    .logo {
-        width: 100px;
-        height: 100px;
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.heroOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0, 80, 181, 0.8), rgba(0, 209, 255, 0.5));
+    z-index: 5;
+    /* Sobre el collageContainer */
+    display: flex;
+    align-items: center;
+    padding: 0 10%;
+}
+
+.heroContent {
+    color: white;
+    max-width: 800px;
+    z-index: 10;
+}
+
+.waveContainer {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    z-index: 15;
+}
+
+.subTitle {
+    color: #00d1ff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.mainTitle {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 15px 0;
+}
+
+.mainTitle span {
+    color: #fe8a0f;
+}
+
+/* Naranja RAX */
+.description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.primaryBtn {
+    background: #fe8a0f;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.phoneBox {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.iconCircle {
+    background: #00d1ff;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.waveContainer {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    z-index: 15;
+}
+
+/* Login Section */
+.loginWrapper {
+    padding: 100px 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+}
+
+.loginCard {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.logoContainer {
+    margin-bottom: 30px;
+}
+
+.logo {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px;
+    position: relative;
+}
+
+.helloText {
+    color: #fe8a0f;
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.secondaryText {
+    color: #5b136f;
+    font-weight: 500;
+}
+
+.inputGroup {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    color: #5b136f;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #eee;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+.passwordInputContainer {
+    position: relative;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fe8a0f;
+    cursor: pointer;
+}
+
+.loginButton {
+    width: 100%;
+    padding: 15px;
+    background: #0050b5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.loginButton:hover {
+    background: #003d8a;
+}
+
+.primaryBtnLink {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.primaryBtn {
+    background: #fe8a0f;
+    /* Naranja RAX */
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    /* Para alinear icono y texto */
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.primaryBtn:hover {
+    background: #e67a0d;
+    /* Un naranja un poco más oscuro al pasar el mouse */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(254, 138, 15, 0.4);
+    cursor: pointer;
+}
+
+/* Tamaño del icono de WhatsApp */
+.waIcon {
+    font-size: 1.7rem;
+    color: white;
+}
+
+/* --- FOOTER --- */
+.footer {
+    background-color: #0d0d0d;
+    /* Fondo negro como la imagen */
+    color: white;
+    position: relative;
+    padding-top: 50px;
+}
+
+/* Curva invertida en la parte superior del footer */
+.footerWave {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    line-height: 0;
+}
+
+.footerContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 5% 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.footerContact {
+    flex: 1;
+    min-width: 280px;
+}
+
+.footerTitle {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: #00d1ff;
+    /* Azul cian para resaltar */
+}
+
+.contactItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.contactIcon {
+    width: 45px;
+    height: 45px;
+    background: rgba(0, 209, 255, 0.1);
+    border: 1px solid #00d1ff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00d1ff;
+    font-size: 1.2rem;
+}
+
+.contactText span {
+    display: block;
+    font-size: 0.85rem;
+    color: #999;
+}
+
+.contactText strong {
+    font-size: 1.1rem;
+    color: #f9f9f9;
+}
+
+.footerLogo {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.footerLogo p {
+    color: #666;
+    font-size: 0.9rem;
+    max-width: 200px;
+}
+
+/* BARRA DE COPYRIGHT */
+.copyrightBar {
+    border-top: 1px solid #222;
+    padding: 25px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.legalLinks {
+    display: flex;
+    gap: 20px;
+}
+
+.legalLinks a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.legalLinks a:hover {
+    color: #00d1ff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footerContainer {
+        flex-direction: column;
+        text-align: center;
     }
 
-    .helloText {
-        font-size: 25px;
+    .contactItem {
+        justify-content: center;
     }
 
-    .secondaryText {
-        font-size: 20px;
+    .copyrightBar {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
     }
 }

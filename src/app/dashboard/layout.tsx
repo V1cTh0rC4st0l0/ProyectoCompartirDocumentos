@@ -1,17 +1,14 @@
-// src/app/dashboard/layout.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '@/styles/adminLayout.module.css';
 import DownloadViewerButton from '@/components/DownloadViewerButton';
-import { FiMenu, FiX } from 'react-icons/fi';
 
-interface DashboardLayoutProps {
-    children: React.ReactNode;
-}
+import { FiMenu, FiX, FiLogOut, } from 'react-icons/fi';
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
@@ -25,33 +22,51 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
-        <div className={styles.dashboardLayoutContainer}>
+        <div className={styles.container}>
+
+            {/* BOTÓN MOBILE */}
             <button className={styles.menuButton} onClick={toggleSidebar}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
             </button>
+
             {isSidebarOpen && (
-                <div className={styles.overlay + ' ' + styles.show} onClick={toggleSidebar}></div>
+                <div className={styles.overlay} onClick={toggleSidebar}></div>
             )}
 
+            {/* SIDEBAR */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
-                <h2 className={styles.sidebarTitle}>RAXVEL</h2>
-                <ul className={styles.sidebarNav}>
-                    <li>
-                        <Link href="/login" className={styles.sidebarLink} onClick={() => setIsSidebarOpen(false)}>
-                            Salir
-                        </Link>
-                    </li>
-                    <li className="mt-6">
+
+                {/* LOGO */}
+                <div className={styles.logoContainer}>
+                    <Image
+                        src="/images/Raxvel_log.png"
+                        alt="logo"
+                        width={70}
+                        height={70}
+                        priority
+                    />
+                    <h2>Raxvel</h2>
+                </div>
+
+                {/* NAV */}
+                <nav className={styles.nav}>
+
+                    <Link href="/login" className={styles.link}>
+                        <FiLogOut /> Salir
+                    </Link>
+
+                    <div className={styles.link}>
                         <DownloadViewerButton />
-                    </li>
-                </ul>
+                    </div>
+
+                </nav>
             </aside>
-            <main className={styles.mainContent}>
+
+            {/* MAIN */}
+            <main className={styles.main}>
                 {children}
             </main>
         </div>

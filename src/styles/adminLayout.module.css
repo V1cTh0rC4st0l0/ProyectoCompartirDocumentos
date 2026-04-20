@@ -1,213 +1,130 @@
-/* /styles/adminLayout.module.css */
-
-.dashboardLayoutContainer {
+.container {
     display: flex;
     min-height: 100vh;
-    position: relative;
 }
 
-/* Sidebar */
+/* SIDEBAR */
 .sidebar {
-    width: 240px;
-    background-image: url('/images/background.jpg');
-    color: #ffffff;
-    padding: 1rem;
+    width: 260px;
+    color: white;
+    padding: 1.5rem 1rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    transition: transform 0.3s ease-in-out;
-    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+
+    background: linear-gradient(to bottom,
+            #0c3c64 0%,
+            rgba(12, 60, 100, 0.95) 30%,
+            rgba(12, 60, 100, 0.85) 55%,
+            rgba(12, 60, 100, 0.6) 75%,
+            rgba(12, 60, 100, 0.3) 100%),
+        url('/images/background.jfif');
+
+    background-size: cover;
+    background-position: bottom;
 }
 
-.sidebarTitle {
-    font-family: 'Kalam', 'Arial Narrow', Arial, sans-serif;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 8px #181f8a, 0 0 15px rgba(170, 248, 255, 0.5);
+/* LOGO */
+.logoContainer {
+    display: flex;
+    align-items: center;
     ;
+    gap: 20px;
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-.sidebarNav {
+.logoContainer img {
+    width: 70px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.logoContainer h2 {
+    color: #5ce7f1;
+}
+
+/* NAV */
+.nav {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 10px;
 }
 
-.sidebarLink {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    background-color: rgba(170, 248, 255, 0.5);
-    color: #5b136f;
-    font-size: 1.5rem;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    text-decoration: none;
-    transition: background-color 0.15s ease-in-out;
+/* LINKS */
+.link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 10px;
+    color: #e2e8f0;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    display: block;
+    transition: 0.2s;
 }
 
-.sidebarLink:hover {
-    background-color: #5ce7f1;
+.link:hover {
+    background: rgba(92, 231, 241, 0.2);
+    color: #5ce7f1;
 }
 
-.downloadButton {
-    background-color: #48bb78;
-    color: #f7fafc;
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    text-decoration: none;
-    text-align: center;
-    transition: background-color 0.15s ease-in-out;
-    display: block;
-    margin-top: 1.5rem;
+/* MAIN */
+.main {
+    flex: 1;
+    background: #f4f7fb;
+    padding: 20px;
 }
 
-.downloadButton:hover {
-    background-color: #38a169;
-}
-
-/* Contenido Principal */
-.mainContent {
-    flex-grow: 1;
-    background-image: url('/images/fondo_tomografia.jpg');
-    background-color: #edf2f7;
-    padding: 1.5rem;
-    /* Aumentado a p-6 para que coincida con el dashboard page.tsx */
-    overflow-y: auto;
-    /* Para permitir el scroll si el contenido es largo */
-}
-
-/* Botón de Menú */
+/* BOTÓN MOBILE */
 .menuButton {
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 60;
-    background-color: #5ce7f1;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+    background: #5ce7f1;
     border: none;
-    width: 60px;
-    height: 50px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    line-height: 1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.2s ease-in-out;
-
-    /* Propiedades clave para la forma de muela */
-    border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
-
-    &::before,
-    &::after {
-        content: '';
-        position: absolute;
-        background-color: inherit;
-        width: 15px;
-        height: 25px;
-        border-radius: 0 0 50% 50%;
-        z-index: -1;
-    }
-
-    &::before {
-        bottom: -15px;
-        left: 10px;
-        transform: rotate(-15deg);
-    }
-
-    &::after {
-        bottom: -15px;
-        right: 10px;
-        transform: rotate(15deg);
-    }
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 20px;
+    display: none;
 }
 
-.menuButton:hover {
-    background-color: #5b136f;
+/* OVERLAY */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
 }
 
-.menuButton svg {
-    color: rgb(0, 0, 0);
-}
-
-.menuButton svg:hover {
-    color: white;
-}
-
-
-@media (max-width: 768px) {
-    .menuButton {
-        display: flex;
-    }
-}
-
-/* Estilos para el modal */
+/* MODALES */
 .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 50;
 }
 
-/* Pantallas grandes (desktop, tablets grandes) */
-@media (min-width: 768px) {
-    .sidebar {
-        transform: translateX(0%);
-        position: relative;
-    }
-
-    .mainContent {
-        margin-left: 0;
-    }
-
-    .menuButton {
-        display: none;
-    }
-}
-
-/* Pantallas pequeñas (móviles) */
-@media (max-width: 767px) {
+/* RESPONSIVE */
+@media (max-width: 768px) {
     .sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
         height: 100%;
-        z-index: 50;
         transform: translateX(-100%);
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .sidebarTitle {
-        transform: translate(30%);
+        z-index: 100;
     }
 
     .sidebar.show {
-        transform: translateX(0%);
+        transform: translateX(0);
     }
 
     .menuButton {
-        display: block;
-    }
-
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 49;
-        display: none;
-    }
-
-    .overlay.show {
         display: block;
     }
 }

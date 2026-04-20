@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '@/styles/adminLayout.module.css';
 import CreateUserModal from '@/components/CreateUserModal';
 import UploadFilesModal from '@/components/UploadFilesModal';
 import UploadViewerModal from '@/components/UploadViewerModal';
-import { FiMenu, FiX } from 'react-icons/fi';
+
+import {
+    FiMenu,
+    FiX,
+    FiLogOut,
+    FiUpload,
+    FiUserPlus,
+    FiPackage
+} from 'react-icons/fi';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,78 +34,87 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
-
-    const openCreateUserModal = () => {
-        setIsCreateUserModalOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const closeCreateUserModal = () => {
-        setIsCreateUserModalOpen(false);
-    };
-
-    const openUploadFilesModal = () => {
-        setIsUploadFilesModalOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const closeUploadFilesModal = () => {
-        setIsUploadFilesModalOpen(false);
-    };
-
-    const openUploadViewerModal = () => {
-        setIsUploadViewerModalOpen(true);
-        setIsSidebarOpen(false);
-    };
-
-    const closeUploadViewerModal = () => {
-        setIsUploadViewerModalOpen(false);
-    };
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
-        <div className={styles.dashboardLayoutContainer}>
+        <div className={styles.container}>
+
+            {/* BOTÓN MOBILE */}
             <button className={styles.menuButton} onClick={toggleSidebar}>
                 {isSidebarOpen ? <FiX /> : <FiMenu />}
             </button>
+
             {isSidebarOpen && (
-                <div className={styles.overlay + ' ' + styles.show} onClick={toggleSidebar}></div>
+                <div className={styles.overlay} onClick={toggleSidebar}></div>
             )}
 
+            {/* SIDEBAR */}
             <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.show : ''}`}>
-                <h1 className={styles.sidebarTitle}>Raxvel</h1>
-                <nav className={styles.sidebarNav}>
-                    <Link href="/login" className={styles.sidebarLink} onClick={() => setIsSidebarOpen(false)}>
-                        Salir
+
+                {/* LOGO */}
+                <div className={styles.logoContainer}>
+                    <Image
+                        src="/images/Raxvel_log.png"
+                        alt="logo"
+                        width={70}
+                        height={70}
+                        priority
+                    />
+                    <h2>Raxvel</h2>
+                </div>
+
+                {/* NAV */}
+                <nav className={styles.nav}>
+
+                    <Link href="/login" className={styles.link}>
+                        <FiLogOut /> Salir
                     </Link>
-                    <button onClick={openUploadFilesModal} className={styles.sidebarLink}>
-                        Subir Archivos
+
+                    <button
+                        onClick={() => setIsUploadFilesModalOpen(true)}
+                        className={styles.link}
+                    >
+                        <FiUpload /> Subir Archivos
                     </button>
-                    <button onClick={openCreateUserModal} className={styles.sidebarLink}>
-                        Crear Usuario
+
+                    <button
+                        onClick={() => setIsCreateUserModalOpen(true)}
+                        className={styles.link}
+                    >
+                        <FiUserPlus /> Crear Usuario
                     </button>
-                    <button onClick={openUploadViewerModal} className={styles.sidebarLink}>
-                        Subir Aplicación
+
+                    <button
+                        onClick={() => setIsUploadViewerModalOpen(true)}
+                        className={styles.link}
+                    >
+                        <FiPackage /> Subir Aplicación
                     </button>
+
                 </nav>
             </aside>
 
-            <main className={styles.mainContent}>{children}</main>
+            {/* CONTENIDO */}
+            <main className={styles.main}>
+                {children}
+            </main>
+
+            {/* MODALES */}
             {isCreateUserModalOpen && (
-                <div className={styles.modalOverlay} onClick={closeCreateUserModal}>
-                    <CreateUserModal onClose={closeCreateUserModal} />
+                <div className={styles.modalOverlay} onClick={() => setIsCreateUserModalOpen(false)}>
+                    <CreateUserModal onClose={() => setIsCreateUserModalOpen(false)} />
                 </div>
             )}
+
             {isUploadFilesModalOpen && (
-                <div className={styles.modalOverlay} onClick={closeUploadFilesModal}>
-                    <UploadFilesModal onClose={closeUploadFilesModal} />
+                <div className={styles.modalOverlay} onClick={() => setIsUploadFilesModalOpen(false)}>
+                    <UploadFilesModal onClose={() => setIsUploadFilesModalOpen(false)} />
                 </div>
             )}
+
             {isUploadViewerModalOpen && (
-                <div className={styles.modalOverlay} onClick={closeUploadViewerModal}>
-                    <UploadViewerModal onClose={closeUploadViewerModal} />
+                <div className={styles.modalOverlay} onClick={() => setIsUploadViewerModalOpen(false)}>
+                    <UploadViewerModal onClose={() => setIsUploadViewerModalOpen(false)} />
                 </div>
             )}
         </div>
